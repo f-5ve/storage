@@ -1,3 +1,13 @@
+-- Unique identifier for this script instance
+local SCRIPT_IDENTIFIER = "awshucksdudewhattheflipspunks"
+
+-- Check for existing instance and terminate it
+if getgenv().currentCrosshairScript then
+    getgenv().currentCrosshairScript:Disconnect()
+    getgenv().currentCrosshairScript = nil
+end
+
+-- Define the new crosshair settings
 getgenv().crosshair = {
     Enabled = true,
     refreshRate = 0.015,
@@ -60,7 +70,8 @@ local function solve(angle, radius)
     )
 end
 
-runservice.PostSimulation:Connect(function()
+-- Run the main loop
+getgenv().currentCrosshairScript = runservice.PostSimulation:Connect(function()
     local _tick = tick()
     if _tick - lastRender > crosshair.refreshRate then
         lastRender = _tick
