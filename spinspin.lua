@@ -2,7 +2,7 @@ getgenv().crosshair = {
     Enabled = true,
     refreshRate = 0.015,
     mode = 'mouse', -- center, mouse, custom
-    customPosition = Vector2.new(0, 0), -- custom position
+    customPos = Vector2.new(0, 0), -- custom position
     lineWidth = 2.5,
     lineLength = 10,
     lineRadius = 11,
@@ -68,7 +68,7 @@ runservice.PostSimulation:Connect(function()
         local position = (
             crosshair.mode == 'center' and camera.ViewportSize / 2 or
             crosshair.mode == 'mouse' and inputservice:GetMouseLocation() or
-            crosshair.customPosition
+            crosshair.customPos
         )
 
         local text1 = drawings.text[1]
