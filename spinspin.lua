@@ -16,6 +16,8 @@ getgenv().crosshair = {
     resizeSpeed = 150,
     minResizeLength = 5,
     maxResizeLength = 22,
+    rainbowMode = false, -- enable or disable rainbow effect
+    rainbowSpeed = 5 -- speed of color cycling in seconds
 }
 
 local crosshair = getgenv().crosshair
@@ -40,6 +42,36 @@ local easingStyles = {
     Cubic = Enum.EasingStyle.Cubic,
     Linear = Enum.EasingStyle.Linear
 }
+
+local function hsvToRgb(h, s, v)
+    local r, g, b
+    local i = math.floor(h * 6)
+    local f = h * 6 - i
+    local p = v * (1 - s)
+    local q = v * (1 - f * s)
+    local t = v * (1 - (1 - f) * s)
+    i = i % 6
+    if i == 0 then
+        r, g, b = v, t, p
+    elseif i == 1 then
+        r, g, b = q, v, p
+    elseif i == 2 then
+        r, g, b = p, v, t
+    elseif i == 3 then
+        r, g, b = p, q, v
+    elseif i == 4 then
+        r, g, b = t, p, v
+    elseif i == 5 then
+        r, g, b = v, p, q
+    end
+    return Color3.fromRGB(r * 255, g * 255, b * 255)
+end
+
+local function getRainbowColor()
+    local time = tick()
+    local hue = (time / crosshair.rainbowSpeed) % 1
+    return hsvToRgb(hue, 1, 1)
+end
 
 local drawings = {
     crosshair = {},
@@ -87,8 +119,13 @@ runservice.PostSimulation:Connect(function()
             local textWidth = text1.TextBounds.X + text2.TextBounds.X
             text1.Position = position + Vector2.new(-textWidth / 2, crosshair.lineRadius + (crosshair.isResizing and crosshair.maxResizeLength or crosshair.lineLength) + 15)
             text2.Position = text1.Position + Vector2.new(text1.TextBounds.X)
-            text2.Color = crosshair.lineColor
             
+            if crosshair.rainbowMode then
+                crosshair.lineColor = getRainbowColor()
+            else
+                text2.Color = crosshair.lineColor
+            end
+
             for idx = 1, 4 do
                 local outline = drawings.crosshair[idx]
                 local inline = drawings.crosshair[idx + 4]
