@@ -1,21 +1,20 @@
--- Define crosshair settings
 getgenv().crosshair = {
-    Enabled = true,
-    refreshRate = 0.015,
+    enabled = true,
+    refreshrate = 0.01,
     mode = 'mouse', -- center, mouse, custom
-    customPos = Vector2.new(0, 0), -- custom position
-    lineWidth = 2.5,
-    lineLength = 10,
-    lineRadius = 11,
-    lineColor = Color3.fromRGB(255, 255, 255),
-    isSpinning = true, -- animate the rotation
-    spinSpeed = 150,
-    maxSpinAngle = 340,
-    spinEasingStyle = "Back", -- supports Sine, Back, Quad, Quart, Quint, Bounce, Elastic, Exponential, Circular, Cubic
-    isResizing = false, -- animate the length
-    resizeSpeed = 150,
-    minResizeLength = 5,
-    maxResizeLength = 22,
+    position = Vector2.new(0,0), -- custom position
+    width = 2.5,
+    length = 10,
+    radius = 11,
+    color = Color3.fromRGB(255, 255, 255),
+    spin = true, -- animate the rotation
+    spin_speed = 250,
+    spin_max = 340,
+    spin_style = "Linear", -- Linear for normal smooth spin
+    resize = false, -- animate the length
+    resize_speed = 150,
+    resize_min = 5,
+    resize_max = 22,
 }
 
 local crosshair = getgenv().crosshair
@@ -23,10 +22,6 @@ local runservice = game:GetService('RunService')
 local inputservice = game:GetService('UserInputService')
 local tweenservice = game:GetService('TweenService')
 local camera = workspace.CurrentCamera
-
-local lastRender = 0
-
--- Easing style mapping
 local easingStyles = {
     Sine = Enum.EasingStyle.Sine,
     Back = Enum.EasingStyle.Back,
@@ -41,11 +36,13 @@ local easingStyles = {
     Linear = Enum.EasingStyle.Linear
 }
 
+local last_render = 0
+
 local drawings = {
     crosshair = {},
     text = {
-        Drawing.new('Text', {Size = 13, Font = 2, Outline = true, Text = 'Misery', Color = Color3.new(1, 1, 1)}),
-        Drawing.new('Text', {Size = 13, Font = 2, Outline = true, Text = '.cc'}),
+        Drawing.new('Text', {Size = 13, Font = 2, Outline = true, Text = 'Kluxuest', Color = Color3.new(1,1,1)}),
+        Drawing.new('Text', {Size = 13, Font = 2, Outline = true, Text = '.fun'}),
     }
 }
 
@@ -63,60 +60,54 @@ end
 
 runservice.PostSimulation:Connect(function()
     local _tick = tick()
-    if _tick - lastRender > crosshair.refreshRate then
-        lastRender = _tick
-
-        -- Adjust mode based on screen focus
-        if not inputservice.WindowFocused then
-            crosshair.mode = 'center'
-        end
+    if _tick - last_render > crosshair.refreshrate then
+        last_render = _tick
 
         local position = (
             crosshair.mode == 'center' and camera.ViewportSize / 2 or
             crosshair.mode == 'mouse' and inputservice:GetMouseLocation() or
-            crosshair.customPos
+            crosshair.position
         )
 
-        local text1 = drawings.text[1]
-        local text2 = drawings.text[2]
+        local text_1 = drawings.text[1]
+        local text_2 = drawings.text[2]
 
-        text1.Visible = crosshair.Enabled
-        text2.Visible = crosshair.Enabled
+        text_1.Visible = crosshair.enabled
+        text_2.Visible = crosshair.enabled
 
-        if crosshair.Enabled then
-            local textWidth = text1.TextBounds.X + text2.TextBounds.X
-            text1.Position = position + Vector2.new(-textWidth / 2, crosshair.lineRadius + (crosshair.isResizing and crosshair.maxResizeLength or crosshair.lineLength) + 15)
-            text2.Position = text1.Position + Vector2.new(text1.TextBounds.X)
-            text2.Color = crosshair.lineColor
+        if crosshair.enabled then
+            local text_x = text_1.TextBounds.X + text_2.TextBounds.X
+            text_1.Position = position + Vector2.new(-text_x / 2, crosshair.radius + (crosshair.resize and crosshair.resize_max or crosshair.length) + 15)
+            text_2.Position = text_1.Position + Vector2.new(text_1.TextBounds.X)
+            text_2.Color = crosshair.color
             
             for idx = 1, 4 do
                 local outline = drawings.crosshair[idx]
                 local inline = drawings.crosshair[idx + 4]
     
                 local angle = (idx - 1) * 90
-                local length = crosshair.lineLength
+                local length = crosshair.length
     
-                if crosshair.isSpinning then
-                    local spinAngle = -_tick * crosshair.spinSpeed % 360
-                    local easingStyle = easingStyles[crosshair.spinEasingStyle] or Enum.EasingStyle.Linear
-                    angle = angle + tweenservice:GetValue(spinAngle / crosshair.maxSpinAngle, easingStyle, Enum.EasingDirection.InOut) * 360
+                if crosshair.spin then
+                    local spin_angle = -_tick * crosshair.spin_speed % 360
+                    angle = angle + tweenservice:GetValue(spin_angle / crosshair.spin_max, crosshair.spin_style, Enum.EasingDirection.InOut) * 360
                 end
     
-                if crosshair.isResizing then
-                    local resizeLength = _tick * crosshair.resizeSpeed % 180
-                    length = crosshair.minResizeLength + math.sin(math.rad(resizeLength)) * (crosshair.maxResizeLength - crosshair.minResizeLength)
+                if crosshair.resize then
+                    local resize_length = _tick * crosshair.resize_speed % 180
+                    length = crosshair.resize_min + math.sin(math.rad(resize_length)) * (crosshair.resize_max - crosshair.resize_min)
                 end
     
                 inline.Visible = true
-                inline.Color = crosshair.lineColor
-                inline.From = position + solve(angle, crosshair.lineRadius)
-                inline.To = position + solve(angle, crosshair.lineRadius + length)
-                inline.Thickness = crosshair.lineWidth
+                inline.Color = crosshair.color
+                inline.From = position + solve(angle, crosshair.radius)
+                inline.To = position + solve(angle, crosshair.radius + length)
+                inline.Thickness = crosshair.width
     
                 outline.Visible = true
-                outline.From = position + solve(angle, crosshair.lineRadius - 1)
-                outline.To = position + solve(angle, crosshair.lineRadius + length + 1)
-                outline.Thickness = crosshair.lineWidth + 1.5    
+                outline.From = position + solve(angle, crosshair.radius - 1)
+                outline.To = position + solve(angle, crosshair.radius + length + 1)
+                outline.Thickness = crosshair.width + 1.5    
             end
         else
             for idx = 1, 4 do
