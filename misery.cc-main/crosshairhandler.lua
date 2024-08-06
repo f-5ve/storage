@@ -2,21 +2,35 @@
 
 local crosshair = {
     enabled = false,
-    refreshrate = 0.015,
-    mode = 'mouse',
-    position = Vector2.new(0,0),
+    refreshrate = 0.01,
+    mode = 'mouse', -- center, mouse, custom
+    position = Vector2.new(0,0), -- custom position
     width = 2.5,
     length = 10,
     radius = 11,
-    color = Color3.fromRGB(66, 84, 245),
-    spin = true,
-    spin_speed = 150,
+    color = Color3.fromRGB(255, 255, 255),
+    spin = true, -- animate the rotation
+    spin_speed = 250,
     spin_max = 340,
-    spin_style = Enum.EasingStyle.Circular,
-    resize = true,
+    spin_style = "Linear", -- Linear for normal smooth spin
+    resize = true, -- animate the length
     resize_speed = 150,
     resize_min = 5,
     resize_max = 22,
+}
+
+local easingStyles = {
+    Sine = Enum.EasingStyle.Sine,
+    Back = Enum.EasingStyle.Back,
+    Quad = Enum.EasingStyle.Quad,
+    Quart = Enum.EasingStyle.Quart,
+    Quint = Enum.EasingStyle.Quint,
+    Bounce = Enum.EasingStyle.Bounce,
+    Elastic = Enum.EasingStyle.Elastic,
+    Exponential = Enum.EasingStyle.Exponential,
+    Circular = Enum.EasingStyle.Circular,
+    Cubic = Enum.EasingStyle.Cubic,
+    Linear = Enum.EasingStyle.Linear
 }
 
 local drawings = {
