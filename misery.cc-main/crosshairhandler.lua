@@ -1,4 +1,5 @@
 -- crosshairhandler.lua
+
 local crosshair = {
     enabled = false,
     refreshrate = 0.015,
