@@ -1,0 +1,386 @@
+local Fluent = loadstring(game:HttpGet("https://github.com/dawid-scripts/Fluent/releases/latest/download/main.lua"))()
+local SaveManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/SaveManager.lua"))()
+local InterfaceManager = loadstring(game:HttpGet("https://raw.githubusercontent.com/dawid-scripts/Fluent/master/Addons/InterfaceManager.lua"))()
+
+-- Create the main window and tabs
+local Window = Fluent:CreateWindow({
+    Title = "Fluent " .. Fluent.Version,
+    SubTitle = "by dawid",
+    TabWidth = 160,
+    Size = UDim2.fromOffset(580, 460),
+    Acrylic = true,
+    Theme = "Dark",
+    MinimizeKey = Enum.KeyCode.LeftControl
+})
+
+local Tabs = {
+    Main = Window:AddTab({ Title = "Main", Icon = "" }),
+    Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
+}
+
+-- Initialize crosshair settings
+getgenv().crosshair = {
+    enabled = true,
+    refreshrate = 0.015,
+    mode = 'mouse',
+    position = Vector2.new(0,0),
+    width = 2.5,
+    length = 10,
+    radius = 11,
+    color = Color3.fromRGB(66, 84, 245),
+    spin = true,
+    spin_speed = 150,
+    spin_max = 340,
+    spin_style = Enum.EasingStyle.Circular,
+    resize = true,
+    resize_speed = 150,
+    resize_min = 5,
+    resize_max = 22,
+}
+
+-- Function to solve for angle and radius
+local function solve(angle, radius)
+    return Vector2.new(
+        math.sin(math.rad(angle)) * radius,
+        math.cos(math.rad(angle)) * radius
+    )
+end
+
+-- Create drawings for crosshair
+local runservice = game:GetService('RunService')
+local inputservice = game:GetService('UserInputService')
+local tweenservice = game:GetService('TweenService')
+local camera = workspace.CurrentCamera
+local last_render = 0
+
+local drawings = {
+    crosshair = {},
+    text = {
+        Drawing.new('Text', {Size = 13, Font = 2, Outline = true, Text = 'Misery', Color = Color3.new(1,1,1)}),
+        Drawing.new('Text', {Size = 13, Font = 2, Outline = true, Text = '.cc'}),
+    }
+}
+
+for idx = 1, 4 do
+    drawings.crosshair[idx] = Drawing.new('Line')
+    drawings.crosshair[idx + 4] = Drawing.new('Line')
+end
+
+runservice.PostSimulation:Connect(function()
+    local _tick = tick()
+    if _tick - last_render > crosshair.refreshrate then
+        last_render = _tick
+        local position = (
+            crosshair.mode == 'center' and camera.ViewportSize / 2 or
+            crosshair.mode == 'mouse' and inputservice:GetMouseLocation() or
+            crosshair.position
+        )
+
+        local text_1 = drawings.text[1]
+        local text_2 = drawings.text[2]
+        text_1.Visible = crosshair.enabled
+        text_2.Visible = crosshair.enabled
+
+        if crosshair.enabled then
+            local text_x = text_1.TextBounds.X + text_2.TextBounds.X
+            text_1.Position = position + Vector2.new(-text_x / 2, crosshair.radius + (crosshair.resize and crosshair.resize_max or crosshair.length) + 15)
+            text_2.Position = text_1.Position + Vector2.new(text_1.TextBounds.X)
+            text_2.Color = crosshair.color
+            
+            for idx = 1, 4 do
+                local outline = drawings.crosshair[idx]
+                local inline = drawings.crosshair[idx + 4]
+    
+                local angle = (idx - 1) * 90
+                local length = crosshair.length
+    
+                if crosshair.spin then
+                    local spin_angle = -_tick * crosshair.spin_speed % crosshair.spin_max
+                    angle = angle + tweenservice:GetValue(spin_angle / 360, crosshair.spin_style, Enum.EasingDirection.InOut) * 360
+                end
+    
+                if crosshair.resize then
+                    local resize_length = tick() * crosshair.resize_speed % 180
+                    length = crosshair.resize_min + math.sin(math.rad(resize_length)) * crosshair.resize_max
+                end
+    
+                inline.Visible = true
+                inline.Color = crosshair.color
+                inline.From = position + solve(angle, crosshair.radius)
+                inline.To = position + solve(angle, crosshair.radius + length)
+                inline.Thickness = crosshair.width
+    
+                outline.Visible = true
+                outline.From = position + solve(angle, crosshair.radius - 1)
+                outline.To = position + solve(angle, crosshair.radius + length + 1)
+                outline.Thickness = crosshair.width + 1.5    
+            end
+        else
+            for idx = 1, 4 do
+                drawings.crosshair[idx].Visible = false
+                drawings.crosshair[idx + 4].Visible = false
+            end
+        end
+    end
+end)
+
+-- Main tab UI elements
+Tabs.Main:AddParagraph({
+    Title = "Paragraph",
+    Content = "This is a paragraph.\nSecond line!"
+})
+
+Tabs.Main:AddButton({
+    Title = "Button",
+    Description = "Very important button",
+    Callback = function()
+        Window:Dialog({
+            Title = "Title",
+            Content = "This is a dialog",
+            Buttons = {
+                { Title = "Confirm", Callback = function() print("Confirmed the dialog.") end },
+                { Title = "Cancel", Callback = function() print("Cancelled the dialog.") end }
+            }
+        })
+    end
+})
+
+local Toggle = Tabs.Main:AddToggle("MyToggle", { Title = "Toggle", Default = false })
+Toggle:OnChanged(function() print("Toggle changed:", Options.MyToggle.Value) end)
+
+local Slider = Tabs.Main:AddSlider("Slider", {
+    Title = "Slider",
+    Description = "This is a slider",
+    Default = 2,
+    Min = 0,
+    Max = 5,
+    Rounding = 1,
+    Callback = function(Value) print("Slider was changed:", Value) end
+})
+Slider:OnChanged(function(Value) print("Slider changed:", Value) end)
+
+local Dropdown = Tabs.Main:AddDropdown("Dropdown", {
+    Title = "Dropdown",
+    Values = { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen" },
+    Multi = false,
+    Default = 1,
+})
+Dropdown:SetValue("four")
+Dropdown:OnChanged(function(Value) print("Dropdown changed:", Value) end)
+
+local MultiDropdown = Tabs.Main:AddDropdown("MultiDropdown", {
+    Title = "Dropdown",
+    Description = "You can select multiple values.",
+    Values = { "one", "two", "three", "four", "five", "six", "seven", "eight", "nine", "ten", "eleven", "twelve", "thirteen", "fourteen" },
+    Multi = true,
+    Default = { "seven", "twelve" },
+})
+MultiDropdown:SetValue({ three = true, five = true, seven = false })
+MultiDropdown:OnChanged(function(Value)
+    local Values = {}
+    for Value, State in next, Value do
+        table.insert(Values, Value)
+    end
+    print("Mutlidropdown changed:", table.concat(Values, ", "))
+end)
+
+local Colorpicker = Tabs.Main:AddColorpicker("Colorpicker", {
+    Title = "Colorpicker",
+    Default = Color3.fromRGB(96, 205, 255)
+})
+Colorpicker:OnChanged(function() print("Colorpicker changed:", Colorpicker.Value) end)
+
+local TColorpicker = Tabs.Main:AddColorpicker("TransparencyColorpicker", {
+    Title = "Colorpicker",
+    Description = "But you can change the transparency.",
+    Transparency = 0,
+    Default = Color3.fromRGB(96, 205, 255)
+})
+TColorpicker:OnChanged(function()
+    print("TColorpicker changed:", TColorpicker.Value, "Transparency:", TColorpicker.Transparency)
+end)
+
+local Keybind = Tabs.Main:AddKeybind("Keybind", {
+    Title = "KeyBind",
+    Mode = "Toggle",
+    Default = "LeftControl",
+    Callback = function(Value) print("Keybind clicked!", Value) end,
+    ChangedCallback = function(New) print("Keybind changed!", New) end
+})
+Keybind:OnClick(function() print("Keybind clicked:", Keybind:GetState()) end)
+Keybind:OnChanged(function() print("Keybind changed:", Keybind.Value) end)
+
+task.spawn(function()
+    while true do
+        wait(1)
+        local state = Keybind:GetState()
+        if state then
+            print("Keybind is being held down")
+        end
+        if Fluent.Unloaded then break end
+    end
+end)
+
+Keybind:SetValue("MB2", "Toggle")
+
+local Input = Tabs.Main:AddInput("Input", {
+    Title = "Input",
+    Default = "Default",
+    Placeholder = "Placeholder",
+    Numeric = false,
+    Finished = false,
+    Callback = function(Value) print("Input changed:", Value) end
+})
+Input:OnChanged(function() print("Input updated:", Input.Value) end)
+
+-- Settings tab UI elements
+local crosshairEnabledToggle = Tabs.Settings:AddToggle("CrosshairEnabled", {
+    Title = "Enable Crosshair",
+    Default = crosshair.enabled
+})
+crosshairEnabledToggle:OnChanged(function(Value) getgenv().crosshair.enabled = Value end)
+
+local crosshairModeDropdown = Tabs.Settings:AddDropdown("CrosshairMode", {
+    Title = "Crosshair Mode",
+    Values = { "center", "mouse", "custom" },
+    Default = 2
+})
+crosshairModeDropdown:OnChanged(function(Value) getgenv().crosshair.mode = Value end)
+
+local crosshairPositionXSlider = Tabs.Settings:AddSlider("CrosshairPositionX", {
+    Title = "Position X",
+    Description = "Custom X Position",
+    Default = crosshair.position.X,
+    Min = -1000,
+    Max = 1000
+})
+crosshairPositionXSlider:OnChanged(function(Value) getgenv().crosshair.position = Vector2.new(Value, crosshair.position.Y) end)
+
+local crosshairPositionYSlider = Tabs.Settings:AddSlider("CrosshairPositionY", {
+    Title = "Position Y",
+    Description = "Custom Y Position",
+    Default = crosshair.position.Y,
+    Min = -1000,
+    Max = 1000
+})
+crosshairPositionYSlider:OnChanged(function(Value) getgenv().crosshair.position = Vector2.new(crosshair.position.X, Value) end)
+
+local crosshairWidthSlider = Tabs.Settings:AddSlider("CrosshairWidth", {
+    Title = "Crosshair Width",
+    Description = "Width of the crosshair",
+    Default = crosshair.width,
+    Min = 1,
+    Max = 10
+})
+crosshairWidthSlider:OnChanged(function(Value) getgenv().crosshair.width = Value end)
+
+local crosshairLengthSlider = Tabs.Settings:AddSlider("CrosshairLength", {
+    Title = "Crosshair Length",
+    Description = "Length of the crosshair",
+    Default = crosshair.length,
+    Min = 1,
+    Max = 50
+})
+crosshairLengthSlider:OnChanged(function(Value) getgenv().crosshair.length = Value end)
+
+local crosshairRadiusSlider = Tabs.Settings:AddSlider("CrosshairRadius", {
+    Title = "Crosshair Radius",
+    Description = "Radius of the crosshair",
+    Default = crosshair.radius,
+    Min = 1,
+    Max = 50
+})
+crosshairRadiusSlider:OnChanged(function(Value) getgenv().crosshair.radius = Value end)
+
+local crosshairColorPicker = Tabs.Settings:AddColorpicker("CrosshairColor", {
+    Title = "Crosshair Color",
+    Default = crosshair.color
+})
+crosshairColorPicker:OnChanged(function(Value) getgenv().crosshair.color = Value end)
+
+local crosshairSpinToggle = Tabs.Settings:AddToggle("CrosshairSpin", {
+    Title = "Animate Spin",
+    Default = crosshair.spin
+})
+crosshairSpinToggle:OnChanged(function(Value) getgenv().crosshair.spin = Value end)
+
+local crosshairSpinSpeedSlider = Tabs.Settings:AddSlider("CrosshairSpinSpeed", {
+    Title = "Spin Speed",
+    Description = "Speed of the crosshair spin",
+    Default = crosshair.spin_speed,
+    Min = 1,
+    Max = 500
+})
+crosshairSpinSpeedSlider:OnChanged(function(Value) getgenv().crosshair.spin_speed = Value end)
+
+local crosshairSpinMaxSlider = Tabs.Settings:AddSlider("CrosshairSpinMax", {
+    Title = "Spin Max",
+    Description = "Max spin angle",
+    Default = crosshair.spin_max,
+    Min = 1,
+    Max = 360
+})
+crosshairSpinMaxSlider:OnChanged(function(Value) getgenv().crosshair.spin_max = Value end)
+
+local crosshairSpinStyleDropdown = Tabs.Settings:AddDropdown("CrosshairSpinStyle", {
+    Title = "Spin Style",
+    Values = { "Linear", "Sine", "Elastic", "Bounce", "Circular", "Exponential" },
+    Default = 6
+})
+crosshairSpinStyleDropdown:OnChanged(function(Value)
+    local styles = { Enum.EasingStyle.Linear, Enum.EasingStyle.Sine, Enum.EasingStyle.Elastic, Enum.EasingStyle.Bounce, Enum.EasingStyle.Circular, Enum.EasingStyle.Exponential }
+    getgenv().crosshair.spin_style = styles[Value]
+end)
+
+local crosshairResizeToggle = Tabs.Settings:AddToggle("CrosshairResize", {
+    Title = "Animate Resize",
+    Default = crosshair.resize
+})
+crosshairResizeToggle:OnChanged(function(Value) getgenv().crosshair.resize = Value end)
+
+local crosshairResizeSpeedSlider = Tabs.Settings:AddSlider("CrosshairResizeSpeed", {
+    Title = "Resize Speed",
+    Description = "Speed of the crosshair resize",
+    Default = crosshair.resize_speed,
+    Min = 1,
+    Max = 500
+})
+crosshairResizeSpeedSlider:OnChanged(function(Value) getgenv().crosshair.resize_speed = Value end)
+
+local crosshairResizeMinSlider = Tabs.Settings:AddSlider("CrosshairResizeMin", {
+    Title = "Resize Min",
+    Description = "Minimum length of the crosshair when resizing",
+    Default = crosshair.resize_min,
+    Min = 1,
+    Max = 50
+})
+crosshairResizeMinSlider:OnChanged(function(Value) getgenv().crosshair.resize_min = Value end)
+
+local crosshairResizeMaxSlider = Tabs.Settings:AddSlider("CrosshairResizeMax", {
+    Title = "Resize Max",
+    Description = "Maximum length of the crosshair when resizing",
+    Default = crosshair.resize_max,
+    Min = 1,
+    Max = 50
+})
+crosshairResizeMaxSlider:OnChanged(function(Value) getgenv().crosshair.resize_max = Value end)
+
+-- Add Addons
+SaveManager:SetLibrary(Fluent)
+InterfaceManager:SetLibrary(Fluent)
+SaveManager:IgnoreThemeSettings()
+SaveManager:SetIgnoreIndexes({})
+InterfaceManager:SetFolder("FluentScriptHub")
+SaveManager:SetFolder("FluentScriptHub/specific-game")
+InterfaceManager:BuildInterfaceSection(Tabs.Settings)
+SaveManager:BuildConfigSection(Tabs.Settings)
+
+Window:SelectTab(1)
+
+Fluent:Notify({
+    Title = "Fluent",
+    Content = "The script has been loaded.",
+    Duration = 8
+})
+
+SaveManager:LoadAutoloadConfig()
