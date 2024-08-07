@@ -1,4 +1,4 @@
--- crosshairhandler.lua
+
 
 local crosshair = {
     enabled = false,
@@ -10,13 +10,13 @@ local crosshair = {
     radius = 11,
     color = Color3.fromRGB(255, 255, 255),
     spin = true, -- animate the rotation
-    spin_speed = 250,
+    spin_speed = 300,
     spin_max = 340,
     spin_style = "Sine", -- Linear for normal smooth spin
     resize = true, -- animate the length
     resize_speed = 150,
     resize_min = 5,
-    resize_max = 22,
+    resize_max = 10,
 }
 
 local easingStyles = {
