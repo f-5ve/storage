@@ -16,7 +16,7 @@ local crosshair = {
     resize = true, -- animate the length
     resize_speed = 150,
     resize_min = 5,
-    resize_max = 8,
+    resize_max = 20,
 }
 
 local easingStyles = {
