@@ -36,8 +36,8 @@ local easingStyles = {
 local drawings = {
     crosshair = {},
     text = {
-        Drawing.new('Text', {Size = 13, Font = 2, Outline = true, Text = 'Misery', Color = Color3.new(1,1,1)}),
-        Drawing.new('Text', {Size = 13, Font = 2, Outline = true, Text = '.cc'}),
+        Drawing.new('Text', {Size = 13, Font = 2, Outline = true, Text = 'severe', Color = Color3.new(1,1,1)}),
+        Drawing.new('Text', {Size = 13, Font = 2, Outline = true, Text = '.cc'}), Color = Color3.fromRGB(0, 0, 0),
     }
 }
 
