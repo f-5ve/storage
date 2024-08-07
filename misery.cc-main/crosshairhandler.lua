@@ -2,7 +2,7 @@
 
 local crosshair = {
     enabled = false,
-    refreshrate = 0.01,
+    refreshrate = 0.015,
     mode = 'mouse', -- center, mouse, custom
     position = Vector2.new(0,0), -- custom position
     width = 2.5,
@@ -12,7 +12,7 @@ local crosshair = {
     spin = true, -- animate the rotation
     spin_speed = 250,
     spin_max = 340,
-    spin_style = "Linear", -- Linear for normal smooth spin
+    spin_style = "Sine", -- Linear for normal smooth spin
     resize = true, -- animate the length
     resize_speed = 150,
     resize_min = 5,
