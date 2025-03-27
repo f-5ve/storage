@@ -851,7 +851,7 @@ local function Tween(instance, properties, duration)
 end
 
 -- Create Section Header
-function Window:CreateSection(parent, name)
+function Library:CreateSection(parent, name)
     local SectionLabel = Create("TextLabel"){
         Name = name .. "Section",
         Parent = parent,
@@ -868,7 +868,7 @@ function Window:CreateSection(parent, name)
 end
 
 -- Create Search Bar
-function Window:CreateSearchBar(parent)
+function Library:CreateSearchBar(parent)
     local SearchBar = Create("Frame"){
         Name = "SearchBar",
         Parent = parent,
@@ -911,7 +911,7 @@ function Window:CreateSearchBar(parent)
 end
 
 -- Create Dropdown
-function Window:CreateDropdown(parent, name, options, default)
+function Library:CreateDropdown(parent, name, options, default)
     local DropdownButton = Create("Frame"){
         Name = name .. "Dropdown",
         Parent = parent,
@@ -992,7 +992,27 @@ end
 
 -- Main Window Creation
 function Library:CreateWindow(title)
-    local Window = {}
+    local Window = {
+        CreateSection = function(parent, name)
+            local SectionLabel = Create("TextLabel"){
+                Name = name .. "Section",
+                Parent = parent,
+                BackgroundTransparency = 1,
+                Position = UDim2.new(0, 10, 0, #parent:GetChildren() * 35),
+                Size = UDim2.new(1, -20, 0, 30),
+                Font = Enum.Font.GothamBold,
+                Text = name,
+                TextColor3 = Color3.fromRGB(100, 100, 100),
+                TextSize = 12,
+                TextXAlignment = Enum.TextXAlignment.Left
+            }
+            return SectionLabel
+        end,
+        CreateSearchBar = Library.CreateSearchBar,
+        CreateDropdown = Library.CreateDropdown,
+        CreateToggle = Window.CreateToggle,
+        CreateCategory = Window.CreateCategory
+    }
     
     -- Main GUI Components
     local ScreenGui = Create("ScreenGui"){
