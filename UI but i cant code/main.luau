@@ -10,7 +10,7 @@ local Tick = tick()
 -- Custom Fonts
 do 
 	-- 
-	writefile("smallest_pixel.ttf", game:HttpGet("https://github.com/f1nobe7650/other/raw/main/ProggyTiny.ttf"))
+	writefile("smallest_pixel.ttf", game:HttpGet("https://github.com/f-5ve/storage/raw/refs/heads/main/fonts/ProggyTiny.ttf"))
 	-- 
 	local smallest_pixel = {
 		name = "SmallestPixel7",
