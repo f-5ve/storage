@@ -992,27 +992,12 @@ end
 
 -- Main Window Creation
 function Library:CreateWindow(title)
-    local Window = {
-        CreateSection = function(parent, name)
-            local SectionLabel = Create("TextLabel"){
-                Name = name .. "Section",
-                Parent = parent,
-                BackgroundTransparency = 1,
-                Position = UDim2.new(0, 10, 0, #parent:GetChildren() * 35),
-                Size = UDim2.new(1, -20, 0, 30),
-                Font = Enum.Font.GothamBold,
-                Text = name,
-                TextColor3 = Color3.fromRGB(100, 100, 100),
-                TextSize = 12,
-                TextXAlignment = Enum.TextXAlignment.Left
-            }
-            return SectionLabel
-        end,
-        CreateSearchBar = Library.CreateSearchBar,
-        CreateDropdown = Library.CreateDropdown,
-        CreateToggle = Window.CreateToggle,
-        CreateCategory = Window.CreateCategory
-    }
+    local Window = {}
+    
+    -- Add methods to Window
+    Window.CreateSection = Library.CreateSection
+    Window.CreateSearchBar = Library.CreateSearchBar
+    Window.CreateDropdown = Library.CreateDropdown
     
     -- Main GUI Components
     local ScreenGui = Create("ScreenGui"){
