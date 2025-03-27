@@ -866,14 +866,21 @@ end
 
 -- Create Section Header
 function Library:CreateSection(parent, name)
+    local childCount = 0
+    for _, child in pairs(parent:GetChildren()) do
+        if child:IsA("Frame") or child:IsA("TextLabel") then
+            childCount = childCount + 1
+        end
+    end
+    
     local SectionLabel = Create("TextLabel"){
-        Name = name .. "Section",
+        Name = tostring(name) .. "_Section",
         Parent = parent,
         BackgroundTransparency = 1,
-        Position = UDim2.new(0, 10, 0, #parent:GetChildren() * 35),
+        Position = UDim2.new(0, 10, 0, childCount * 35),
         Size = UDim2.new(1, -20, 0, 30),
         Font = Enum.Font.GothamBold,
-        Text = name,
+        Text = tostring(name),
         TextColor3 = Color3.fromRGB(100, 100, 100),
         TextSize = 12,
         TextXAlignment = Enum.TextXAlignment.Left
@@ -1013,13 +1020,24 @@ function Library:CreateWindow(title)
     Window.CreateSearchBar = Library.CreateSearchBar
     Window.CreateDropdown = Library.CreateDropdown
     Window.CreateToggle = function(category, name, callback, iconId)
-        -- Toggle Creation Function implementation
+        local childCount = 0
+        for _, child in pairs(category:GetChildren()) do
+            if child:IsA("Frame") or child:IsA("TextLabel") then
+                childCount = childCount + 1
+            end
+        end
+        
         local ToggleButton = Create("Frame"){
-            Name = name .. "Toggle",
+            Name = tostring(name) .. "_Toggle",
             Parent = category,
             BackgroundColor3 = Color3.fromRGB(255, 255, 255),
             Size = UDim2.new(1, -20, 0, 30),
-            Position = UDim2.new(0, 10, 0, #category:GetChildren() * 35)
+            Position = UDim2.new(0, 10, 0, childCount * 35)
+        }
+        
+        local UICorner = Create("UICorner"){
+            CornerRadius = UDim.new(0, 6),
+            Parent = ToggleButton
         }
         
         local ToggleLabel = Create("TextLabel"){
@@ -1029,7 +1047,7 @@ function Library:CreateWindow(title)
             Position = UDim2.new(0, iconId and 30 or 10, 0, 0),
             Size = UDim2.new(1, -60, 1, 0),
             Font = Enum.Font.Gotham,
-            Text = name,
+            Text = tostring(name),
             TextColor3 = Color3.fromRGB(60, 60, 60),
             TextSize = 14,
             TextXAlignment = Enum.TextXAlignment.Left
@@ -1048,7 +1066,7 @@ function Library:CreateWindow(title)
             BorderSizePixel = 0
         }
         
-        local UICorner = Create("UICorner"){
+        local UICorner_2 = Create("UICorner"){
             CornerRadius = UDim.new(0, 8),
             Parent = ToggleIndicator
         }

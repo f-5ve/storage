@@ -9,41 +9,45 @@ local VisualsCategory = Window:CreateCategory("Visuals", "lucide-eye")
 local WorldCategory = Window:CreateCategory("World", "lucide-globe")
 local CommonCategory = Window:CreateCategory("Common", "lucide-settings")
 
+-- Make the Visuals category visible by default
+for _, content in pairs(VisualsCategory.Parent:GetChildren()) do
+    content.Visible = false
+end
+VisualsCategory.Visible = true
+
 -- Add search bar to Visuals category
 local SearchBar = Window:CreateSearchBar(VisualsCategory)
 
 -- Add sections to Visuals category
 local PlayersSection = Window:CreateSection(VisualsCategory, "PLAYERS")
+wait(0.1) -- Small wait to ensure proper positioning
 local ModelsSection = Window:CreateSection(VisualsCategory, "MODELS")
 
 -- Add toggles to Players section
+wait(0.1) -- Small wait to ensure proper positioning
 Window:CreateToggle(VisualsCategory, "Enabled", function(enabled)
     print("Enabled:", enabled)
 end, "lucide-eye")
 
+wait(0.1) -- Small wait to ensure proper positioning
 Window:CreateToggle(VisualsCategory, "Teammates", function(enabled)
     print("Teammates:", enabled)
 end, "lucide-users")
 
+wait(0.1) -- Small wait to ensure proper positioning
 Window:CreateToggle(VisualsCategory, "Bullet Tracers", function(enabled)
     print("Bullet Tracers:", enabled)
 end, "lucide-line")
 
 -- Add toggles to Models section
+wait(0.1) -- Small wait to ensure proper positioning
 Window:CreateToggle(VisualsCategory, "Enemies", function(enabled)
-    if enabled then
-        print("Enemies ESP Enabled")
-    else
-        print("Enemies ESP Disabled")
-    end
+    print("Enemies ESP:", enabled)
 end, "lucide-user-x")
 
+wait(0.1) -- Small wait to ensure proper positioning
 Window:CreateToggle(VisualsCategory, "Teammates", function(enabled)
-    if enabled then
-        print("Teammates Models Enabled")
-    else
-        print("Teammates Models Disabled")
-    end
+    print("Teammates Models:", enabled)
 end, "lucide-users")
 
 Window:CreateToggle(VisualsCategory, "Local Player", function(enabled)
@@ -113,6 +117,9 @@ Window:CreateToggle(CommonCategory, "Force Thirdperson", function(enabled)
 end, "lucide-camera")
 
 -- Add dropdowns to Common category
+wait(0.1) -- Small wait to ensure proper positioning
 Window:CreateDropdown(CommonCategory, "Visual Recoil", {"Default", "None", "Custom"}, "Default")
+wait(0.1) -- Small wait to ensure proper positioning
 Window:CreateDropdown(CommonCategory, "Crosshair", {"Default", "Custom", "None"}, "Default")
+wait(0.1) -- Small wait to ensure proper positioning
 Window:CreateDropdown(CommonCategory, "Removals", {"Smoke", "Flash", "Blood", "All"}, "None")
