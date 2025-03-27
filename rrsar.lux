@@ -1,0 +1,243 @@
+--[[
+    LenyLib UI Library for Synapse X
+    Inspired by modern UI design
+]]
+
+local Library = {}
+local TweenService = game:GetService("TweenService")
+local UserInputService = game:GetService("UserInputService")
+local CoreGui = game:GetService("CoreGui")
+
+-- Utility Functions
+local function Create(instanceType)
+    return function(properties)
+        local instance = Instance.new(instanceType)
+        for property, value in next, properties do
+            instance[property] = value
+        end
+        return instance
+    end
+end
+
+local function Tween(instance, properties, duration)
+    local tweenInfo = TweenInfo.new(duration or 0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
+    local tween = TweenService:Create(instance, tweenInfo, properties)
+    tween:Play()
+    return tween
+end
+
+-- Main Window Creation
+function Library:CreateWindow(title)
+    local Window = {}
+    
+    -- Main GUI Components
+    local ScreenGui = Create("ScreenGui"){
+        Name = "LenyLib",
+        Parent = CoreGui,
+        ZIndexBehavior = Enum.ZIndexBehavior.Sibling
+    }
+    
+    local MainFrame = Create("Frame"){
+        Name = "MainFrame",
+        Parent = ScreenGui,
+        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+        Position = UDim2.new(0.5, -250, 0.5, -200),
+        Size = UDim2.new(0, 500, 0, 400),
+        ClipsDescendants = true
+    }
+    
+    local UICorner = Create("UICorner"){
+        CornerRadius = UDim.new(0, 8),
+        Parent = MainFrame
+    }
+    
+    local TopBar = Create("Frame"){
+        Name = "TopBar",
+        Parent = MainFrame,
+        BackgroundColor3 = Color3.fromRGB(245, 245, 245),
+        Size = UDim2.new(1, 0, 0, 30)
+    }
+    
+    local TitleLabel = Create("TextLabel"){
+        Name = "Title",
+        Parent = TopBar,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 10, 0, 0),
+        Size = UDim2.new(1, -20, 1, 0),
+        Font = Enum.Font.GothamMedium,
+        Text = title,
+        TextColor3 = Color3.fromRGB(60, 60, 60),
+        TextSize = 14,
+        TextXAlignment = Enum.TextXAlignment.Left
+    }
+    
+    -- Category System
+    local CategoryContainer = Create("Frame"){
+        Name = "CategoryContainer",
+        Parent = MainFrame,
+        BackgroundColor3 = Color3.fromRGB(240, 240, 240),
+        Position = UDim2.new(0, 0, 0, 30),
+        Size = UDim2.new(0, 120, 1, -30)
+    }
+    
+    local ContentContainer = Create("Frame"){
+        Name = "ContentContainer",
+        Parent = MainFrame,
+        BackgroundColor3 = Color3.fromRGB(250, 250, 250),
+        Position = UDim2.new(0, 120, 0, 30),
+        Size = UDim2.new(1, -120, 1, -30)
+    }
+    
+    -- Toggle Creation Function
+    function Window:CreateToggle(category, name, callback)
+        local ToggleButton = Create("Frame"){
+            Name = name .. "Toggle",
+            Parent = category,
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+            Size = UDim2.new(1, -20, 0, 30),
+            Position = UDim2.new(0, 10, 0, #category:GetChildren() * 35)
+        }
+        
+        local ToggleLabel = Create("TextLabel"){
+            Name = "Label",
+            Parent = ToggleButton,
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, -50, 1, 0),
+            Font = Enum.Font.Gotham,
+            Text = name,
+            TextColor3 = Color3.fromRGB(60, 60, 60),
+            TextSize = 14,
+            TextXAlignment = Enum.TextXAlignment.Left
+        }
+        
+        local ToggleIndicator = Create("Frame"){
+            Name = "Indicator",
+            Parent = ToggleButton,
+            BackgroundColor3 = Color3.fromRGB(200, 200, 200),
+            Position = UDim2.new(1, -35, 0.5, -10),
+            Size = UDim2.new(0, 30, 0, 16),
+            BorderSizePixel = 0
+        }
+        
+        local UICorner = Create("UICorner"){
+            CornerRadius = UDim.new(0, 8),
+            Parent = ToggleIndicator
+        }
+        
+        local ToggleCircle = Create("Frame"){
+            Name = "Circle",
+            Parent = ToggleIndicator,
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+            Position = UDim2.new(0, 2, 0.5, -6),
+            Size = UDim2.new(0, 12, 0, 12),
+            BorderSizePixel = 0
+        }
+        
+        local UICorner = Create("UICorner"){
+            CornerRadius = UDim.new(1, 0),
+            Parent = ToggleCircle
+        }
+        
+        local toggled = false
+        
+        ToggleButton.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                toggled = not toggled
+                
+                if toggled then
+                    Tween(ToggleIndicator, {BackgroundColor3 = Color3.fromRGB(90, 90, 255)})
+                    Tween(ToggleCircle, {Position = UDim2.new(1, -14, 0.5, -6)})
+                else
+                    Tween(ToggleIndicator, {BackgroundColor3 = Color3.fromRGB(200, 200, 200)})
+                    Tween(ToggleCircle, {Position = UDim2.new(0, 2, 0.5, -6)})
+                end
+                
+                if callback then
+                    callback(toggled)
+                end
+            end
+        end)
+        
+        return ToggleButton
+    end
+    
+    -- Category Creation Function
+    function Window:CreateCategory(name)
+        local CategoryButton = Create("TextButton"){
+            Name = name .. "Category",
+            Parent = CategoryContainer,
+            BackgroundColor3 = Color3.fromRGB(235, 235, 235),
+            Size = UDim2.new(1, 0, 0, 35),
+            Position = UDim2.new(0, 0, 0, #CategoryContainer:GetChildren() * 35),
+            Font = Enum.Font.GothamMedium,
+            Text = name,
+            TextColor3 = Color3.fromRGB(60, 60, 60),
+            TextSize = 14
+        }
+        
+        local CategoryContent = Create("ScrollingFrame"){
+            Name = name .. "Content",
+            Parent = ContentContainer,
+            BackgroundTransparency = 1,
+            Size = UDim2.new(1, 0, 1, 0),
+            ScrollBarThickness = 4,
+            Visible = false,
+            AutomaticCanvasSize = Enum.AutomaticSize.Y,
+            CanvasSize = UDim2.new(0, 0, 0, 0)
+        }
+        
+        CategoryButton.MouseButton1Click:Connect(function()
+            for _, content in pairs(ContentContainer:GetChildren()) do
+                content.Visible = false
+            end
+            CategoryContent.Visible = true
+            
+            for _, button in pairs(CategoryContainer:GetChildren()) do
+                if button:IsA("TextButton") then
+                    Tween(button, {BackgroundColor3 = Color3.fromRGB(235, 235, 235)})
+                end
+            end
+            Tween(CategoryButton, {BackgroundColor3 = Color3.fromRGB(90, 90, 255)})
+            Tween(CategoryButton, {TextColor3 = Color3.fromRGB(255, 255, 255)})
+        end)
+        
+        return CategoryContent
+    end
+    
+    -- Dragging Functionality
+    local dragging
+    local dragInput
+    local dragStart
+    local startPos
+    
+    TopBar.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = true
+            dragStart = input.Position
+            startPos = MainFrame.Position
+        end
+    end)
+    
+    TopBar.InputEnded:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            dragging = false
+        end
+    end)
+    
+    UserInputService.InputChanged:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseMovement then
+            dragInput = input
+        end
+    end)
+    
+    game:GetService("RunService").RenderStepped:Connect(function()
+        if dragging and dragInput then
+            local delta = dragInput.Position - dragStart
+            MainFrame.Position = UDim2.new(startPos.X.Scale, startPos.X.Offset + delta.X, startPos.Y.Scale, startPos.Y.Offset + delta.Y)
+        end
+    end)
+    
+    return Window
+end
+
+return Library 
