@@ -1,5 +1,5 @@
 -- Load the UI Library from GitHub
-local Library = loadstring(game:HttpGet("https://raw.githubusercontent.com/f-5ve/storage/refs/heads/main/UI%20but%20i%20cant%20code/main.luau"))()
+local Library = loadstring(game:HttpGet('https://raw.githubusercontent.com/f-5ve/storage/main/UI%20but%20i%20cant%20code/main.luau'))()
 
 -- Create the main window
 local Window = Library:CreateWindow("Leny")
@@ -10,38 +10,26 @@ local WorldCategory = Window:CreateCategory("World", "lucide-globe")
 local CommonCategory = Window:CreateCategory("Common", "lucide-settings")
 
 -- Add search bar to Visuals category
-Window:CreateSearchBar(VisualsCategory)
+local SearchBar = Window:CreateSearchBar(VisualsCategory)
 
--- Players Section in Visuals
-Window:CreateSection(VisualsCategory, "PLAYERS")
+-- Add sections to Visuals category
+local PlayersSection = Window:CreateSection(VisualsCategory, "PLAYERS")
+local ModelsSection = Window:CreateSection(VisualsCategory, "MODELS")
 
+-- Add toggles to Players section
 Window:CreateToggle(VisualsCategory, "Enabled", function(enabled)
-    if enabled then
-        print("Visuals Enabled")
-    else
-        print("Visuals Disabled")
-    end
+    print("Enabled:", enabled)
 end, "lucide-eye")
 
 Window:CreateToggle(VisualsCategory, "Teammates", function(enabled)
-    if enabled then
-        print("Teammates ESP Enabled")
-    else
-        print("Teammates ESP Disabled")
-    end
+    print("Teammates:", enabled)
 end, "lucide-users")
 
 Window:CreateToggle(VisualsCategory, "Bullet Tracers", function(enabled)
-    if enabled then
-        print("Bullet Tracers Enabled")
-    else
-        print("Bullet Tracers Disabled")
-    end
+    print("Bullet Tracers:", enabled)
 end, "lucide-line")
 
--- Models Section in Visuals
-Window:CreateSection(VisualsCategory, "MODELS")
-
+-- Add toggles to Models section
 Window:CreateToggle(VisualsCategory, "Enemies", function(enabled)
     if enabled then
         print("Enemies ESP Enabled")
@@ -124,7 +112,7 @@ Window:CreateToggle(CommonCategory, "Force Thirdperson", function(enabled)
     end
 end, "lucide-camera")
 
--- Add dropdowns to Common Category
+-- Add dropdowns to Common category
 Window:CreateDropdown(CommonCategory, "Visual Recoil", {"Default", "None", "Custom"}, "Default")
-Window:CreateDropdown(CommonCategory, "Crosshair", {"Default", "Custom", "None"}, "Select")
-Window:CreateDropdown(CommonCategory, "Removals", {"Smoke", "Flash", "Blood", "All"}, "Select")
+Window:CreateDropdown(CommonCategory, "Crosshair", {"Default", "Custom", "None"}, "Default")
+Window:CreateDropdown(CommonCategory, "Removals", {"Smoke", "Flash", "Blood", "All"}, "None")

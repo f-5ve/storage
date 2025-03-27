@@ -850,6 +850,20 @@ local function Tween(instance, properties, duration)
     return tween
 end
 
+-- Create Icon Function
+local function CreateIcon(parent, iconId, position)
+    local Icon = Create("ImageLabel"){
+        Name = "Icon",
+        Parent = parent,
+        BackgroundTransparency = 1,
+        Position = position or UDim2.new(0, 8, 0.5, -8),
+        Size = UDim2.new(0, 16, 0, 16),
+        Image = Icons.assets[iconId] or "",
+        ImageColor3 = Color3.fromRGB(60, 60, 60)
+    }
+    return Icon
+end
+
 -- Create Section Header
 function Library:CreateSection(parent, name)
     local SectionLabel = Create("TextLabel"){
@@ -998,6 +1012,83 @@ function Library:CreateWindow(title)
     Window.CreateSection = Library.CreateSection
     Window.CreateSearchBar = Library.CreateSearchBar
     Window.CreateDropdown = Library.CreateDropdown
+    Window.CreateToggle = function(category, name, callback, iconId)
+        -- Toggle Creation Function implementation
+        local ToggleButton = Create("Frame"){
+            Name = name .. "Toggle",
+            Parent = category,
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+            Size = UDim2.new(1, -20, 0, 30),
+            Position = UDim2.new(0, 10, 0, #category:GetChildren() * 35)
+        }
+        
+        local ToggleLabel = Create("TextLabel"){
+            Name = "Label",
+            Parent = ToggleButton,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, iconId and 30 or 10, 0, 0),
+            Size = UDim2.new(1, -60, 1, 0),
+            Font = Enum.Font.Gotham,
+            Text = name,
+            TextColor3 = Color3.fromRGB(60, 60, 60),
+            TextSize = 14,
+            TextXAlignment = Enum.TextXAlignment.Left
+        }
+        
+        if iconId then
+            CreateIcon(ToggleButton, iconId)
+        end
+        
+        local ToggleIndicator = Create("Frame"){
+            Name = "Indicator",
+            Parent = ToggleButton,
+            BackgroundColor3 = Color3.fromRGB(200, 200, 200),
+            Position = UDim2.new(1, -35, 0.5, -10),
+            Size = UDim2.new(0, 30, 0, 16),
+            BorderSizePixel = 0
+        }
+        
+        local UICorner = Create("UICorner"){
+            CornerRadius = UDim.new(0, 8),
+            Parent = ToggleIndicator
+        }
+        
+        local ToggleCircle = Create("Frame"){
+            Name = "Circle",
+            Parent = ToggleIndicator,
+            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+            Position = UDim2.new(0, 2, 0.5, -6),
+            Size = UDim2.new(0, 12, 0, 12),
+            BorderSizePixel = 0
+        }
+        
+        local UICorner_2 = Create("UICorner"){
+            CornerRadius = UDim.new(1, 0),
+            Parent = ToggleCircle
+        }
+        
+        local toggled = false
+        
+        ToggleButton.InputBegan:Connect(function(input)
+            if input.UserInputType == Enum.UserInputType.MouseButton1 then
+                toggled = not toggled
+                
+                if toggled then
+                    Tween(ToggleIndicator, {BackgroundColor3 = Color3.fromRGB(90, 90, 255)})
+                    Tween(ToggleCircle, {Position = UDim2.new(1, -14, 0.5, -6)})
+                else
+                    Tween(ToggleIndicator, {BackgroundColor3 = Color3.fromRGB(200, 200, 200)})
+                    Tween(ToggleCircle, {Position = UDim2.new(0, 2, 0.5, -6)})
+                end
+                
+                if callback then
+                    callback(toggled)
+                end
+            end
+        end)
+        
+        return ToggleButton
+    end
     
     -- Main GUI Components
     local ScreenGui = Create("ScreenGui"){
@@ -1059,84 +1150,6 @@ function Library:CreateWindow(title)
         Position = UDim2.new(0, 120, 0, 30),
         Size = UDim2.new(1, -120, 1, -30)
     }
-    
-    -- Toggle Creation Function
-    function Window:CreateToggle(category, name, callback, iconId)
-        local ToggleButton = Create("Frame"){
-            Name = name .. "Toggle",
-            Parent = category,
-            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-            Size = UDim2.new(1, -20, 0, 30),
-            Position = UDim2.new(0, 10, 0, #category:GetChildren() * 35)
-        }
-        
-        local ToggleLabel = Create("TextLabel"){
-            Name = "Label",
-            Parent = ToggleButton,
-            BackgroundTransparency = 1,
-            Position = UDim2.new(0, iconId and 30 or 10, 0, 0),
-            Size = UDim2.new(1, -60, 1, 0),
-            Font = Enum.Font.Gotham,
-            Text = name,
-            TextColor3 = Color3.fromRGB(60, 60, 60),
-            TextSize = 14,
-            TextXAlignment = Enum.TextXAlignment.Left
-        }
-        
-        if iconId then
-            CreateIcon(ToggleButton, iconId)
-        end
-        
-        local ToggleIndicator = Create("Frame"){
-            Name = "Indicator",
-            Parent = ToggleButton,
-            BackgroundColor3 = Color3.fromRGB(200, 200, 200),
-            Position = UDim2.new(1, -35, 0.5, -10),
-            Size = UDim2.new(0, 30, 0, 16),
-            BorderSizePixel = 0
-        }
-        
-        local UICorner = Create("UICorner"){
-            CornerRadius = UDim.new(0, 8),
-            Parent = ToggleIndicator
-        }
-        
-        local ToggleCircle = Create("Frame"){
-            Name = "Circle",
-            Parent = ToggleIndicator,
-            BackgroundColor3 = Color3.fromRGB(255, 255, 255),
-            Position = UDim2.new(0, 2, 0.5, -6),
-            Size = UDim2.new(0, 12, 0, 12),
-            BorderSizePixel = 0
-        }
-        
-        local UICorner = Create("UICorner"){
-            CornerRadius = UDim.new(1, 0),
-            Parent = ToggleCircle
-        }
-        
-        local toggled = false
-        
-        ToggleButton.InputBegan:Connect(function(input)
-            if input.UserInputType == Enum.UserInputType.MouseButton1 then
-                toggled = not toggled
-                
-                if toggled then
-                    Tween(ToggleIndicator, {BackgroundColor3 = Color3.fromRGB(90, 90, 255)})
-                    Tween(ToggleCircle, {Position = UDim2.new(1, -14, 0.5, -6)})
-                else
-                    Tween(ToggleIndicator, {BackgroundColor3 = Color3.fromRGB(200, 200, 200)})
-                    Tween(ToggleCircle, {Position = UDim2.new(0, 2, 0.5, -6)})
-                end
-                
-                if callback then
-                    callback(toggled)
-                end
-            end
-        end)
-        
-        return ToggleButton
-    end
     
     -- Category Creation Function
     function Window:CreateCategory(name, iconId)
