@@ -833,34 +833,161 @@ local Icons = {
 }
 
 -- Utility Functions
-local function Create(instanceType)
+local function Create(className)
     return function(properties)
-        local instance = Instance.new(instanceType)
-        for property, value in next, properties do
-            instance[property] = value
+        local instance = Instance.new(className)
+        for k, v in pairs(properties) do
+            instance[k] = v
         end
         return instance
     end
 end
 
 local function Tween(instance, properties, duration)
-    local tweenInfo = TweenInfo.new(duration or 0.3, Enum.EasingStyle.Quad, Enum.EasingDirection.Out)
-    local tween = TweenService:Create(instance, tweenInfo, properties)
+    duration = duration or 0.2
+    local tween = TweenService:Create(instance, TweenInfo.new(duration, Enum.EasingStyle.Quad), properties)
     tween:Play()
     return tween
 end
 
-local function CreateIcon(parent, iconId, position)
-    local icon = Create("ImageLabel"){
-        Name = "Icon",
+-- Create Section Header
+function Window:CreateSection(parent, name)
+    local SectionLabel = Create("TextLabel"){
+        Name = name .. "Section",
         Parent = parent,
         BackgroundTransparency = 1,
-        Position = position or UDim2.new(0, 5, 0.5, -8),
-        Size = UDim2.new(0, 16, 0, 16),
-        Image = Icons.assets[iconId] or "",
-        ImageColor3 = Color3.fromRGB(60, 60, 60)
+        Position = UDim2.new(0, 10, 0, #parent:GetChildren() * 35),
+        Size = UDim2.new(1, -20, 0, 30),
+        Font = Enum.Font.GothamBold,
+        Text = name,
+        TextColor3 = Color3.fromRGB(100, 100, 100),
+        TextSize = 12,
+        TextXAlignment = Enum.TextXAlignment.Left
     }
-    return icon
+    return SectionLabel
+end
+
+-- Create Search Bar
+function Window:CreateSearchBar(parent)
+    local SearchBar = Create("Frame"){
+        Name = "SearchBar",
+        Parent = parent,
+        BackgroundColor3 = Color3.fromRGB(245, 245, 245),
+        Position = UDim2.new(0, 10, 0, 5),
+        Size = UDim2.new(1, -20, 0, 30),
+        BorderSizePixel = 0
+    }
+
+    local UICorner = Create("UICorner"){
+        CornerRadius = UDim.new(0, 6),
+        Parent = SearchBar
+    }
+
+    local SearchIcon = Create("ImageLabel"){
+        Name = "SearchIcon",
+        Parent = SearchBar,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 8, 0.5, -8),
+        Size = UDim2.new(0, 16, 0, 16),
+        Image = Icons.assets["lucide-search"],
+        ImageColor3 = Color3.fromRGB(120, 120, 120)
+    }
+
+    local SearchBox = Create("TextBox"){
+        Name = "SearchBox",
+        Parent = SearchBar,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 32, 0, 0),
+        Size = UDim2.new(1, -40, 1, 0),
+        Font = Enum.Font.Gotham,
+        PlaceholderText = "Search",
+        Text = "",
+        TextColor3 = Color3.fromRGB(60, 60, 60),
+        TextSize = 14,
+        TextXAlignment = Enum.TextXAlignment.Left
+    }
+
+    return SearchBar
+end
+
+-- Create Dropdown
+function Window:CreateDropdown(parent, name, options, default)
+    local DropdownButton = Create("Frame"){
+        Name = name .. "Dropdown",
+        Parent = parent,
+        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+        Size = UDim2.new(1, -20, 0, 30),
+        Position = UDim2.new(0, 10, 0, #parent:GetChildren() * 35)
+    }
+
+    local DropdownLabel = Create("TextLabel"){
+        Name = "Label",
+        Parent = DropdownButton,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0, 10, 0, 0),
+        Size = UDim2.new(0.5, -10, 1, 0),
+        Font = Enum.Font.Gotham,
+        Text = name,
+        TextColor3 = Color3.fromRGB(60, 60, 60),
+        TextSize = 14,
+        TextXAlignment = Enum.TextXAlignment.Left
+    }
+
+    local SelectedOption = Create("TextLabel"){
+        Name = "Selected",
+        Parent = DropdownButton,
+        BackgroundTransparency = 1,
+        Position = UDim2.new(0.5, 0, 0, 0),
+        Size = UDim2.new(0.5, -10, 1, 0),
+        Font = Enum.Font.Gotham,
+        Text = default or "Select",
+        TextColor3 = Color3.fromRGB(120, 120, 120),
+        TextSize = 14,
+        TextXAlignment = Enum.TextXAlignment.Right
+    }
+
+    local DropdownList = Create("Frame"){
+        Name = "List",
+        Parent = DropdownButton,
+        BackgroundColor3 = Color3.fromRGB(255, 255, 255),
+        Position = UDim2.new(0, 0, 1, 5),
+        Size = UDim2.new(1, 0, 0, #options * 30),
+        Visible = false,
+        ZIndex = 10
+    }
+
+    local UICorner = Create("UICorner"){
+        CornerRadius = UDim.new(0, 6),
+        Parent = DropdownList
+    }
+
+    for i, option in ipairs(options) do
+        local OptionButton = Create("TextButton"){
+            Name = option,
+            Parent = DropdownList,
+            BackgroundTransparency = 1,
+            Position = UDim2.new(0, 0, 0, (i-1) * 30),
+            Size = UDim2.new(1, 0, 0, 30),
+            Font = Enum.Font.Gotham,
+            Text = option,
+            TextColor3 = Color3.fromRGB(60, 60, 60),
+            TextSize = 14,
+            ZIndex = 10
+        }
+
+        OptionButton.MouseButton1Click:Connect(function()
+            SelectedOption.Text = option
+            DropdownList.Visible = false
+        end)
+    end
+
+    DropdownButton.InputBegan:Connect(function(input)
+        if input.UserInputType == Enum.UserInputType.MouseButton1 then
+            DropdownList.Visible = not DropdownList.Visible
+        end
+    end)
+
+    return DropdownButton
 end
 
 -- Main Window Creation
