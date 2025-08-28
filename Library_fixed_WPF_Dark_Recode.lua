@@ -946,7 +946,7 @@ local function ripple(button, x, y)
 end
 
 local windows = 0
-local library = {}
+local Library = {}
 
 local function format_windows()
 	local ull = Prefabs:FindFirstChild("UIListLayout"):Clone()
@@ -966,11 +966,11 @@ local function format_windows()
 	end
 end
 
-function library:FormatWindows()
+function Library:FormatWindows()
 	format_windows()
 end
 
-function library:AddWindow(title, options)
+function Library:AddWindow(title, options)
 	windows = windows + 1
 	local dropdown_open = false
 	title = tostring(title or "New Window")
@@ -2023,7 +2023,7 @@ function library:AddWindow(title, options)
 	return window_data, Window
 end
 
-return library
+return Library
 
 
 
