@@ -6954,7 +6954,7 @@ end
 end
 }end function a.P()
 game:GetService"UserInputService"
-local aa=game.Players.LocalPlayer:GetMouse()
+local aa=game:GetService("Players").LocalPlayer:GetMouse()
 
 local ac=a.load'a'
 local ae=ac.New
