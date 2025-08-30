@@ -6954,7 +6954,12 @@ end
 end
 }end function a.P()
 game:GetService"UserInputService"
-local aa=game:GetService("Players").LocalPlayer:GetMouse()
+local aa
+if game.Players and game.Players.LocalPlayer then
+	aa = game.Players.LocalPlayer:GetMouse()
+else
+	aa = nil
+end
 
 local ac=a.load'a'
 local ae=ac.New
