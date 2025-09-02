@@ -1003,7 +1003,7 @@ repeat task.wait(1)until game:IsLoaded();
 
 
 local ai=false;
-local aj,ak,al,am,an,ao,ap,aq,ar=setclipboard or toclipboard,request or http_request or syn_request,string.char,tostring,string.sub,os.time,math.random,math.floor,gethwid or function()return game:GetService"Players".LocalPlayer.UserId end
+local aj,ak,al,am,an,ao,ap,aq,ar=setclipboard or toclipboard,request or http_request or syn_request,string.char,tostring,string.sub,os.time,math.random,math.floor,gethwid or function()return CloneRef(game:GetService("Players")).LocalPlayer.UserId end
 local as,at="",0;
 
 
@@ -1260,7 +1260,7 @@ local ab={}
 
 
 function ab.New(ac)
-local ad=gethwid or function()return game:GetService"Players".LocalPlayer.UserId end
+local ad=gethwid or function()return CloneRef(game:GetService("Players")).LocalPlayer.UserId end
 local ae,af=request or http_request or syn_request,setclipboard or toclipboard
 
 function ValidateKey(ag)
@@ -5025,7 +5025,7 @@ end
 
 return ae end function a.H()
 local aa=game:GetService"UserInputService"
-local ac=game:GetService"Players".LocalPlayer:GetMouse()
+local ac=CloneRef(game:GetService("Players")).LocalPlayer:GetMouse()
 local ae=game:GetService"Workspace".CurrentCamera
 
 local af=a.load'a'
@@ -5963,7 +5963,7 @@ aa.Tween
 local af=game:GetService"UserInputService"
 game:GetService"TouchInputService"
 local ag=game:GetService"RunService"
-local ah=game:GetService"Players"
+local ah=CloneRef(game:GetService("Players"))
 
 local ai=ag.RenderStepped
 local aj=ah.LocalPlayer
@@ -9612,7 +9612,7 @@ ai.Themes=ah
 
 local al=a.load'q'local am=
 
-game:GetService"Players"and game:GetService"Players".LocalPlayer or nil
+CloneRef(game:GetService("Players"))and CloneRef(game:GetService("Players")).LocalPlayer or nil
 
 
 local an=protectgui or(syn and syn.protect_gui)or function()end
@@ -9820,7 +9820,7 @@ ai.SetTheme(av)
 
 
 local aw=gethwid or function()
-return game:GetService"Players".LocalPlayer.UserId
+return CloneRef(game:GetService("Players")).LocalPlayer.UserId
 end
 
 local ax=aw()
