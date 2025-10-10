@@ -395,11 +395,11 @@ for _, path in next, library.folders do
 makefolder(library.directory .. path)
 end 
 
-writefile(library.directory .. "/fonts/main.ttf", game:HttpGet("https://github.com/tulontop/headshots/raw/refs/heads/main/Storage/Fonts/fs-tahoma-8px.ttf"))
+writefile(library.directory .. "/fonts/main.ttf", game:HttpGet("https://github.com/f-5ve/storage/raw/refs/heads/main/fonts/ProggyTiny.ttf"))
 
 pcall(function()
-    local tahoma = {
-        name = "SmallestPixel7",
+    local ProggyTiny = {
+        name = "ProggyTiny",
         faces = {
             {
                 name = "Regular",
@@ -410,7 +410,7 @@ pcall(function()
         }
     }
         
-    writefile(library.directory .. "/fonts/main_encoded.ttf", http_service:JSONEncode(tahoma))
+    writefile(library.directory .. "/fonts/main_encoded.ttf", http_service:JSONEncode(ProggyTiny))
         
     library.font = Font.new(getcustomasset(library.directory .. "/fonts/main_encoded.ttf"), Enum.FontWeight.Regular)
 end)
@@ -5076,11 +5076,11 @@ end
 
 -- // Custom Assets
 
--- Pink Shyt Aura
-writefile(library.directory .. "/assets/PinkShyt.rbxm", game:HttpGet("https://github.com/tulontop/headshots/raw/refs/heads/main/Storage/Particles/PinkShyt.rbxm"))
+-- -- Pink Shyt Aura
+-- writefile(library.directory .. "/assets/PinkShyt.rbxm", game:HttpGet("https://github.com/tulontop/headshots/raw/refs/heads/main/Storage/Particles/PinkShyt.rbxm"))
 
--- Walk Steps
-writefile(library.directory .. "/assets/WalkSteps.rbxm", game:HttpGet("https://github.com/tulontop/headshots/raw/refs/heads/main/Storage/Particles/WalkSteps.rbxm"))
+-- -- Walk Steps
+-- writefile(library.directory .. "/assets/WalkSteps.rbxm", game:HttpGet("https://github.com/tulontop/headshots/raw/refs/heads/main/Storage/Particles/WalkSteps.rbxm"))
 
 -- // Custom Commands
 
@@ -5993,6 +5993,7 @@ game:GetService("RunService").Heartbeat:Connect(function(dt)
                     if headshots.HitEffects.HitNotifications then
                         library:notification({ text = "headshots.cc - Target Hit: " .. TargetPlayer.Name .. " - Health: " .. currentHealth, time = headshots.HitEffects.HitNotificationsTime })
                     end
+
 
                     if headshots.HitEffects.HitSounds then
                         createHitSound()
@@ -7167,7 +7168,7 @@ pcall(function()
 
     local camera, client, mouse = workspace.CurrentCamera, players.LocalPlayer, user_input_service:GetMouseLocation()
 
-    local data = http_service:JSONDecode(game:HttpGet("https://raw.githubusercontent.com/weedhook/table/refs/heads/main/stored/hood_games.json"))
+    local data = http_service:JSONDecode(game:HttpGet("https://raw.githubusercontent.com/weedhook/kittyware/refs/heads/main/stored/hood_games.json"))
     local current_game = data.place_ids[tostring(game.PlaceId)] and data.place_ids[tostring(game.PlaceId)][1] or nil
 
     local vec_3, vec_2, cframe, udim_2, color_3, brickcolor = Vector3.new, Vector2.new, CFrame.new, UDim2.new, Color3.new, BrickColor.new
