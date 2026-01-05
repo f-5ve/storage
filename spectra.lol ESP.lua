@@ -1,41 +1,28 @@
 local core_gui = cloneref(game:GetService('CoreGui'))
 local fonts = {
-    {"ProggyClean.ttf", "ProggyClean.json", "https://www.wfonts.com/download/data/7000/Proggy-Clean.ttf"}, -- pixel programming font (free) :contentReference[oaicite:0]{index=0}
-    {"ProggyTiny.ttf", "ProggyTiny.json", "https://www.wfonts.com/font/proggy-tiny"},             -- tiny pixel font (look for .ttf there) :contentReference[oaicite:1]{index=1}
-    {"Minecraftia.ttf", "Minecraftia.json", "https://www.dafont.com/minecraftia.font"},             -- large pixel font (DaFont) :contentReference[oaicite:2]{index=2}
-    {"SmallestPixel7.ttf", "SmallestPixel7.json", "https://www.dafont.com/smallest-pixel-7.font"},  -- pixel bitmap font :contentReference[oaicite:3]{index=3}
-    {"Verdana.ttf", "Verdana.json", "https://example.com/fonts/Verdana.ttf"},                      -- *replace with licensed source* 
-    {"VerdanaBold.ttf", "VerdanaBold.json", "https://example.com/fonts/Verdana-Bold.ttf"},         -- *replace with licensed source* 
-    {"Tahoma.ttf", "Tahoma.json", "https://example.com/fonts/Tahoma.ttf"},                        -- *replace with licensed source*
-    {"TahomaBold.ttf", "TahomaBold.json", "https://example.com/fonts/Tahoma-Bold.ttf"},            -- *replace with licensed source*
-    {"CSGO.ttf", "CSGO.json", "https://example.com/fonts/CSGO.ttf"},                              -- *replace with licensed source*
-    {"WindowsXPTahoma.ttf", "WindowsXPTahoma.json", "https://example.com/fonts/WinXP-Tahoma.ttf"}, -- *replace with licensed source*
-    {"Stratum2.ttf", "Stratum2.json", "https://example.com/fonts/Stratum2.ttf"},                  -- *replace with licensed source*
-    {"Visitor.ttf", "Visitor.json", "https://example.com/fonts/Visitor.ttf"},                     -- *replace with licensed source*
+    {"ProggyClean.ttf", "ProggyClean.json", "https://github.com/bluescan/proggyfonts/raw/master/ProggyClean.ttf"},
+    {"ProggyTiny.ttf", "ProggyTiny.json", "https://github.com/bluescan/proggyfonts/raw/master/ProggyTiny.ttf"},
+    {"Minecraftia.ttf", "Minecraftia.json", "https://github.com/IdreesInc/Minecraft-Font/raw/master/Minecraftia.ttf"},
+    {"SmallestPixel7.ttf", "SmallestPixel7.json", "https://github.com/majodev/google-fonts/raw/main/ofl/smallestpixel7/SmallestPixel7.ttf"},
+
+    {"Verdana.ttf", "Verdana.json", "https://github.com/google/fonts/raw/main/apache/roboto/Roboto-Regular.ttf"},
+    {"VerdanaBold.ttf", "VerdanaBold.json", "https://github.com/google/fonts/raw/main/apache/roboto/Roboto-Bold.ttf"},
+    {"Tahoma.ttf", "Tahoma.json", "https://github.com/google/fonts/raw/main/ofl/inter/Inter-Regular.ttf"},
+    {"TahomaBold.ttf", "TahomaBold.json", "https://github.com/google/fonts/raw/main/ofl/inter/Inter-Bold.ttf"},
+
+    {"CSGO.ttf", "CSGO.json", "https://github.com/google/fonts/raw/main/ofl/rajdhani/Rajdhani-Bold.ttf"},
+    {"Stratum2.ttf", "Stratum2.json", "https://github.com/google/fonts/raw/main/ofl/archivo/Archivo-SemiBold.ttf"},
+    {"Visitor.ttf", "Visitor.json", "https://github.com/IdreesInc/Monocraft/raw/main/Monocraft.ttf"},
 }
 
 
 for _, font in pairs(fonts) do
     local ttf, json, url = font[1], font[2], font[3]
-
-    if not isfile(ttf) then
-        local data = game:HttpGet(url)
-        writefile(ttf, data)
-    end
-
+    if not isfile(ttf) then writefile(ttf, base64_decode(game:HttpGet(url))) end
     if not isfile(json) then
-        writefile(json, game:GetService("HttpService"):JSONEncode({
-            name = ttf:match("([^%.]+)"),
-            faces = {{
-                name = "Regular",
-                weight = 200,
-                style = "normal",
-                assetId = getcustomasset(ttf)
-            }}
-        }))
+        writefile(json, game:GetService('HttpService'):JSONEncode({name = ttf:match("([^%.]+)"), faces = {{name = "Regular", weight = 200, style = "normal", assetId = getcustomasset(ttf)}}}))
     end
 end
-
 
 local Enumed = {}
 for _, font in pairs(fonts) do
