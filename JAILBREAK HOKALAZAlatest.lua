@@ -855,21 +855,79 @@ vu6.MouseButton1Click:Connect(function()
             },
             activeaction = {}
         }
-        local v124 = {
-            updateseeking = require(game:GetService("ReplicatedStorage").VehicleLink.VehicleLinkBinder)._constructor._updateSeeking,
-            hittargetwithspeed = require(game:GetService("ReplicatedStorage").Module.SimulatedPhysicsProjectile).HitTargetWithSpeed,
-            isflying = require(game:GetService("ReplicatedStorage").Game.Paraglide).IsFlying,
-            tase = require(game:GetService("ReplicatedStorage").Game.Item.Taser).Tase,
-            doesplayerowncached = require(game:GetService("ReplicatedStorage").Game.Gamepass.GamepassSystem).doesPlayerOwnCached,
-            update = require(game:GetService("ReplicatedStorage").Module.UI).CircleAction.Update,
-            getequiptime = require(game:GetService("ReplicatedStorage").Game.GunShop.GunUtils).getEquipTime,
-            rayignorenon = require(game:GetService("ReplicatedStorage").Module.RayCast).RayIgnoreNonCollide,
-            plasmashootother = require(game:GetService("ReplicatedStorage").Game.Item.PlasmaGun).ShootOther,
-            pistolsetupmodel = require(game:GetService("ReplicatedStorage").Game.Item.Pistol).SetupModel,
-            rayignore = require(game:GetService("ReplicatedStorage").Module.RayCast).RayIgnoreNonCollideWithIgnoreList,
-            shoot = require(game:GetService("ReplicatedStorage").Game.Item.Gun).Shoot,
-            attemptToggleCrawling = getupvalue(require(game:GetService("ReplicatedStorage").Game.DefaultActions).crawlButton.onPressed, 1).attemptToggleCrawling
-        }
+        local ReplicatedStorage = game:GetService("ReplicatedStorage")
+
+local function safe(name, fn)
+    local ok, result = pcall(fn)
+    if not ok then
+        warn("[FAILED]", name, result)
+        return nil
+    end
+    return result
+end
+
+local v124 = {
+    updateseeking = safe("updateseeking", function()
+        return require(ReplicatedStorage.VehicleLink.VehicleLinkBinder)
+            ._constructor._updateSeeking
+    end),
+
+    hittargetwithspeed = safe("hittargetwithspeed", function()
+        return require(ReplicatedStorage.Module.SimulatedPhysicsProjectile)
+            .HitTargetWithSpeed
+    end),
+
+    isflying = safe("isflying", function()
+        return require(ReplicatedStorage.Game.Paraglide).IsFlying
+    end),
+
+    tase = safe("tase", function()
+        return require(ReplicatedStorage.Game.Item.Taser).Tase
+    end),
+
+    doesplayerowncached = safe("doesplayerowncached", function()
+        return require(ReplicatedStorage.Game.Gamepass.GamepassSystem)
+            .doesPlayerOwnCached
+    end),
+
+    update = safe("update", function()
+        return require(ReplicatedStorage.Module.UI).CircleAction.Update
+    end),
+
+    getequiptime = safe("getequiptime", function()
+        return require(ReplicatedStorage.Game.GunShop.GunUtils).getEquipTime
+    end),
+
+    rayignorenon = safe("rayignorenon", function()
+        return require(ReplicatedStorage.Module.RayCast).RayIgnoreNonCollide
+    end),
+
+    plasmashootother = safe("plasmashootother", function()
+        return require(ReplicatedStorage.Game.Item.PlasmaGun).ShootOther
+    end),
+
+    pistolsetupmodel = safe("pistolsetupmodel", function()
+        return require(ReplicatedStorage.Game.Item.Pistol).SetupModel
+    end),
+
+    rayignore = safe("rayignore", function()
+        return require(ReplicatedStorage.Module.RayCast)
+            .RayIgnoreNonCollideWithIgnoreList
+    end),
+
+    shoot = safe("shoot", function()
+        return require(ReplicatedStorage.Game.Item.Gun).Shoot
+    end),
+
+    attemptToggleCrawling = safe("attemptToggleCrawling", function()
+        return getupvalue(
+            require(ReplicatedStorage.Game.DefaultActions)
+                .crawlButton.onPressed,
+            1
+        ).attemptToggleCrawling
+    end),
+}
+
         vu123.ori = v124
         vu123.guardnpcbinder = require(game:GetService("ReplicatedStorage").GuardNPC.GuardNPCBinder)
         vu123.combatconst = require(game:GetService("ReplicatedStorage").Combat.CombatConsts)
