@@ -17,7 +17,7 @@
 
 
 local a a={cache={}, load=function(b)if not a.cache[b]then a.cache[b]={c=a[b]()}end return a.cache[b].c end}do function a.a()
-
+local CloneRef                    = cloneref or function(...) return ... end
 
 
 
@@ -6954,7 +6954,7 @@ end
 end
 }end function a.P()
 game:GetService"UserInputService"
-local aa=game.Players.LocalPlayer:GetMouse()
+local aa=CloneRef(game:GetService("Players")).LocalPlayer:GetMouse()
 
 local ac=a.load'a'
 local ae=ac.New
@@ -8347,8 +8347,8 @@ end
 
 local ay
 if ao.User.Enabled then local
-az, aA=game.Players:GetUserThumbnailAsync(
-ao.User.Anonymous and 1 or game.Players.LocalPlayer.UserId,
+az, aA=CloneRef(game:GetService("Players")):GetUserThumbnailAsync(
+ao.User.Anonymous and 1 or CloneRef(game:GetService("Players")).LocalPlayer.UserId,
 Enum.ThumbnailType.HeadShot,
 Enum.ThumbnailSize.Size420x420
 )
@@ -8411,7 +8411,7 @@ AutomaticSize="XY",
 BackgroundTransparency=1,
 },{
 ag("TextLabel",{
-Text=ao.User.Anonymous and"Anonymous"or game.Players.LocalPlayer.DisplayName,
+Text=ao.User.Anonymous and"Anonymous"or CloneRef(game:GetService("Players")).LocalPlayer.DisplayName,
 TextSize=17,
 ThemeTag={
 TextColor3="Text",
@@ -8424,7 +8424,7 @@ TextTruncate="AtEnd",
 TextXAlignment="Left",
 }),
 ag("TextLabel",{
-Text=ao.User.Anonymous and"@anonymous"or"@"..game.Players.LocalPlayer.Name,
+Text=ao.User.Anonymous and"@anonymous"or"@"..CloneRef(game:GetService("Players")).LocalPlayer.Name,
 TextSize=15,
 TextTransparency=.6,
 ThemeTag={
