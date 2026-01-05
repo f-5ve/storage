@@ -886,7 +886,7 @@ local v124 = {
     end),
 
     doesplayerowncached = safe("doesplayerowncached", function()
-        return require(ReplicatedStorage.Game.Gamepass.GamepassSystem)
+        return require(ReplicatedStorage.Gamepass.GamepassSystem) 
             .doesPlayerOwnCached
     end),
 
