@@ -1,18 +1,19 @@
 local core_gui = cloneref(game:GetService('CoreGui'))
 local fonts = {
-    {"ProggyClean.ttf", "ProggyClean.json", "https://raw.githubusercontent.com/suspendthread/uwu/refs/heads/main/dependencies/assets/fonts/ProggyClean.txt"},
-    {"ProggyTiny.ttf", "ProggyTiny.json", "https://raw.githubusercontent.com/suspendthread/uwu/refs/heads/main/dependencies/assets/fonts/ProggyTiny.txt"},
-    {"Minecraftia.ttf", "Minecraftia.json", "https://raw.githubusercontent.com/suspendthread/uwu/refs/heads/main/dependencies/assets/fonts/Minecraftia.txt"},
-    {"SmallestPixel7.ttf", "SmallestPixel7.json", "https://raw.githubusercontent.com/suspendthread/uwu/refs/heads/main/dependencies/assets/fonts/SmallestPixel7.txt"},
-    {"Verdana.ttf", "Verdana.json", "https://raw.githubusercontent.com/suspendthread/uwu/refs/heads/main/dependencies/assets/fonts/Verdana.txt"},
-    {"VerdanaBold.ttf", "VerdanaBold.json", "https://raw.githubusercontent.com/suspendthread/uwu/refs/heads/main/dependencies/assets/fonts/VerdanaBold.txt"},
-    {"Tahoma.ttf", "Tahoma.json", "https://raw.githubusercontent.com/suspendthread/uwu/refs/heads/main/dependencies/assets/fonts/Tahoma.txt"},
-    {"TahomaBold.ttf", "TahomaBold.json", "https://raw.githubusercontent.com/suspendthread/uwu/refs/heads/main/dependencies/assets/fonts/TahomaBold.txt"},
-    {"CSGO.ttf", "CSGO.json", "https://raw.githubusercontent.com/suspendthread/uwu/refs/heads/main/dependencies/assets/fonts/CSGO.txt"},
-    {"WindowsXPTahoma.ttf", "WindowsXPTahoma.json", "https://raw.githubusercontent.com/suspendthread/uwu/refs/heads/main/dependencies/assets/fonts/WindowsXPTahoma.txt"},
-    {"Stratum2.ttf", "Stratum2.json", "https://raw.githubusercontent.com/suspendthread/uwu/refs/heads/main/dependencies/assets/fonts/Stratum2.txt"},
-    {"Visitor.ttf", "Visitor.json", "https://raw.githubusercontent.com/suspendthread/uwu/refs/heads/main/dependencies/assets/fonts/Visitor.txt"},
+    {"ProggyClean.ttf", "ProggyClean.json", "https://www.wfonts.com/download/data/7000/Proggy-Clean.ttf"}, -- pixel programming font (free) :contentReference[oaicite:0]{index=0}
+    {"ProggyTiny.ttf", "ProggyTiny.json", "https://www.wfonts.com/font/proggy-tiny"},             -- tiny pixel font (look for .ttf there) :contentReference[oaicite:1]{index=1}
+    {"Minecraftia.ttf", "Minecraftia.json", "https://www.dafont.com/minecraftia.font"},             -- large pixel font (DaFont) :contentReference[oaicite:2]{index=2}
+    {"SmallestPixel7.ttf", "SmallestPixel7.json", "https://www.dafont.com/smallest-pixel-7.font"},  -- pixel bitmap font :contentReference[oaicite:3]{index=3}
+    {"Verdana.ttf", "Verdana.json", "https://example.com/fonts/Verdana.ttf"},                      -- *replace with licensed source* 
+    {"VerdanaBold.ttf", "VerdanaBold.json", "https://example.com/fonts/Verdana-Bold.ttf"},         -- *replace with licensed source* 
+    {"Tahoma.ttf", "Tahoma.json", "https://example.com/fonts/Tahoma.ttf"},                        -- *replace with licensed source*
+    {"TahomaBold.ttf", "TahomaBold.json", "https://example.com/fonts/Tahoma-Bold.ttf"},            -- *replace with licensed source*
+    {"CSGO.ttf", "CSGO.json", "https://example.com/fonts/CSGO.ttf"},                              -- *replace with licensed source*
+    {"WindowsXPTahoma.ttf", "WindowsXPTahoma.json", "https://example.com/fonts/WinXP-Tahoma.ttf"}, -- *replace with licensed source*
+    {"Stratum2.ttf", "Stratum2.json", "https://example.com/fonts/Stratum2.ttf"},                  -- *replace with licensed source*
+    {"Visitor.ttf", "Visitor.json", "https://example.com/fonts/Visitor.ttf"},                     -- *replace with licensed source*
 }
+
 
 for _, font in pairs(fonts) do
     local ttf, json, url = font[1], font[2], font[3]
