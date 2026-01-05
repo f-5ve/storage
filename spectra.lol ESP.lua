@@ -17,11 +17,25 @@ local fonts = {
 
 for _, font in pairs(fonts) do
     local ttf, json, url = font[1], font[2], font[3]
-    if not isfile(ttf) then writefile(ttf, base64_decode(game:HttpGet(url))) end
+
+    if not isfile(ttf) then
+        local data = game:HttpGet(url)
+        writefile(ttf, data)
+    end
+
     if not isfile(json) then
-        writefile(json, game:GetService('HttpService'):JSONEncode({name = ttf:match("([^%.]+)"), faces = {{name = "Regular", weight = 200, style = "normal", assetId = getcustomasset(ttf)}}}))
+        writefile(json, game:GetService("HttpService"):JSONEncode({
+            name = ttf:match("([^%.]+)"),
+            faces = {{
+                name = "Regular",
+                weight = 200,
+                style = "normal",
+                assetId = getcustomasset(ttf)
+            }}
+        }))
     end
 end
+
 
 local Enumed = {}
 for _, font in pairs(fonts) do
