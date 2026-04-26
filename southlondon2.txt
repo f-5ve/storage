@@ -1,0 +1,90 @@
+-- Services
+local Players = game:GetService("Players")
+local CurrentCamera = workspace.CurrentCamera
+
+-- Cache for added models
+local cache = {models = {}}
+
+-- Recursive function to find all models with a root part
+local function getHumRootModels(parent)
+    local models = {}
+    for _, child in ipairs(parent:GetChildren()) do
+        if child.PrimaryPart then
+            table.insert(models, child)
+        elseif #child:GetChildren() > 0 then
+            local subModels = getHumRootModels(child)
+            for _, m in ipairs(subModels) do
+                table.insert(models, m)
+            end
+        end
+    end
+    return models
+end
+
+local function addNPCModel(model)
+    if not model.PrimaryPart then
+        print("[DEBUG] Skipping add_model_data for", model.Name, "because PrimaryPart is nil")
+        return
+    end
+
+    -- Use model name + PrimaryPart address as key
+    local key = model.Name .. "_" .. tostring(model.PrimaryPart)
+    if cache.models[key] then
+        print("[DEBUG] Skipping add_model_data for", model.Name, "key already exists:", key)
+        return
+    end
+
+    local data = {
+        Username = model.Name,
+        Displayname = model.Name,
+        Userid = 0,
+        Character = model,
+        PrimaryPart = model.PrimaryPart,
+        Head = model.PrimaryPart,
+        LeftLeg = model.PrimaryPart,
+        LeftArm = model.PrimaryPart,
+        RightLeg = model.PrimaryPart,
+        RightArm = model.PrimaryPart,
+        Torso = model.PrimaryPart,
+        BodyHeightScale = 1,
+        RigType = 1,
+        Whitelisted = true,
+        Archenemies = false,
+        Aimbot_Part = model.PrimaryPart,
+        Aimbot_TP_Part = model.PrimaryPart,
+        Triggerbot_Part = model.PrimaryPart,
+        Health = 100,
+        MaxHealth = 100,
+        body_parts_data = {},
+        full_body_data = {}
+    }
+
+    print("[DEBUG] Adding model data for", model.Name, "with key:", key)
+    local success, err = pcall(function()
+        add_model_data(data, key)
+    end)
+    if not success then
+        warn("[ERROR] Failed add_model_data for", model.Name, ":", err)
+    else
+        cache.models[key] = true
+    end
+end
+
+-- Function to process all NPCs in workspace
+local function processAllNPCs()
+    print("[DEBUG] Scanning entire workspace for NPCs...")
+    local allModels = getHumRootModels(workspace)
+    print("[DEBUG] Found", #allModels, "models with root parts")
+    for _, model in ipairs(allModels) do
+        addNPCModel(model)
+    end
+end
+
+-- Trigger once using the internal Render system
+if CurrentCamera.Render then
+    -- If Render supports calling a function each frame
+    CurrentCamera.Render(processAllNPCs)
+else
+    -- Otherwise just run it once
+    processAllNPCs()
+end
