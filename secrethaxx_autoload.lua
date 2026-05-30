@@ -36,6 +36,7 @@ do --// UI Source
         },
 
         FontSize = 12,
+        CornerRadius = 5,
 
         Animation = {
             Time = 0.3,
@@ -256,6 +257,13 @@ do --// UI Source
                 else
                     Data.Instance[Index] = Property
                 end
+            end
+
+            if Data.Instance:IsA("GuiObject") then
+                local Corner = Instance.new("UICorner")
+                Corner.Name = "\0"
+                Corner.CornerRadius = UDim.new(0, Library.CornerRadius)
+                Corner.Parent = Data.Instance
             end
 
             return setmetatable(Data, Library)
