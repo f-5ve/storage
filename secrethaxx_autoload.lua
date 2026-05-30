@@ -172,7 +172,7 @@ do --// UI Source
                 ["Outline 3"] = Color3.fromRGB(15, 15, 15),
                 ["Outline 4"] = Color3.fromRGB(10, 10, 10),
                 ["Inactive Text"] = Color3.fromRGB(135, 135, 135),
-                ["Accent"] = Color3.fromRGB(126, 192, 255), -- 126, 192, 255
+                ["Accent"] = Color3.fromRGB(84, 0, 255), -- 84, 0, 255
                 ["Hovered Element"] = Color3.fromRGB(35, 35, 35),
             }
         }
@@ -2010,7 +2010,7 @@ do --// UI Source
                 Params = Params or { }
 
                 local KeybindList = {
-                    Name = Params.Name or Params.name or 'hot<font color="rgb(126, 192, 255)">keys</font>',
+                    Name = Params.Name or Params.name or 'hot<font color="rgb(84, 0, 255)">keys</font>',
 
                     Items = { },
                 }
@@ -2312,7 +2312,7 @@ do --// UI Source
                 Params = Params or { }
 
                 local StaffList = {
-                    Name = Params.Name or Params.name or 'staff<font color="rgb(126, 192, 255)"> list</font>',
+                    Name = Params.Name or Params.name or 'staff<font color="rgb(84, 0, 255)"> list</font>',
 
                     Items = { }
                 }
