@@ -205,7 +205,7 @@ do --// UI Source
 
             Library.Font = CustomFont:New("WindowsXPTAHOMA", 400, "Regular", {
                 Id = "WindowsXPTAHOMA",
-                Url = "https://github.com/sametexe001/luas/raw/refs/heads/main/fonts/windows-xp-tahoma.ttf"
+                Url = "https://github.com/sametexe001/luas/raw/refs/heads/main/fonts/Poppins-Medium.ttf"
             })
 
             Library.BoldFont = CustomFont:New("Tahoma8PTBOLD", 400, "Regular", {
@@ -2176,6 +2176,11 @@ do --// UI Source
                         SortOrder = Enum.SortOrder.LayoutOrder
                     })
 
+                    Items["Title"]:MakeDraggable(Items["KeybindList"])
+                    Items["_"]:MakeDraggable(Items["KeybindList"])
+                    Items["Text"]:MakeDraggable(Items["KeybindList"])
+                    Items["Content"]:MakeDraggable(Items["KeybindList"])
+
                     KeybindList.Items = Items
                 end
 
@@ -2251,6 +2256,11 @@ do --// UI Source
                             Name = "\0",
                             Parent = NewItems["Mode"].Instance
                         })
+
+                        NewItems["NewKey"]:MakeDraggable(Items["KeybindList"])
+                        NewItems["Holder"]:MakeDraggable(Items["KeybindList"])
+                        NewItems["Text"]:MakeDraggable(Items["KeybindList"])
+                        NewItems["Mode"]:MakeDraggable(Items["KeybindList"])
                     end
 
                     task.wait()
