@@ -402,12 +402,18 @@ do --// UI Source
             end)
         end
 
-        Library.MakeDraggable = function(Self)
+        Library.MakeDraggable = function(Self, Target)
             if not Self.Instance then
                 return
             end
 
-            local Gui = Self.Instance
+            Target = Target or Self
+
+            if not Target.Instance then
+                return
+            end
+
+            local Gui = Target.Instance
             local Dragging = false
             local DragStart
             local StartPosition
@@ -423,7 +429,7 @@ do --// UI Source
                 NewX = math.clamp(NewX, 0, ScreenSize.X - GuiSize.X)
                 NewY = math.clamp(NewY, 0, ScreenSize.Y - GuiSize.Y)
 
-                Self:Tween({Position = UDim2.new(0, NewX, 0, NewY)}, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out))
+                Target:Tween({Position = UDim2.new(0, NewX, 0, NewY)}, TweenInfo.new(0.35, Enum.EasingStyle.Quart, Enum.EasingDirection.Out))
             end
 
             local InputChanged
@@ -3107,25 +3113,25 @@ do --// UI Source
                 }
 
                 local Items = { } do
-                    if IsMobile then
-                        Library:Create("UIScale", {
-                            Parent = Items["MainFrame"],
-                            Scale = 0.67 -- funyn
-                        })
-                    end
-
                     Items["MainFrame"] = Library:Create("Frame", {
                         Name = "\0",
                         Parent = Library.Holder.Instance,
                         AnchorPoint = Vector2.new(0.5, 0.5),
                         Position = UDim2.new(0.5, 0, 0.5, 0),
-                        Size = UDim2.new(0, 485, 0, 417),
+                        Size = UDim2.new(0, 505, 0, 437),
                         BorderSizePixel = 0,
                         BackgroundColor3 = Library.Theme["Background"]
                     }):AddToTheme({BackgroundColor3 = 'Background'})
 
+                    if IsMobile then
+                        Library:Create("UIScale", {
+                            Parent = Items["MainFrame"].Instance,
+                            Scale = 0.67 -- funyn
+                        })
+                    end
+
                     Items["MainFrame"]:MakeDraggable()
-                    Items["MainFrame"]:MakeResizeable(Vector2.new(Items["MainFrame"].Instance.AbsoluteSize.X, Items["MainFrame"].Instance.AbsoluteSize.Y))
+                    Items["MainFrame"]:MakeResizeable(Vector2.new(505, 437))
 
                     Library:Create("UIStroke", {
                         Name = "\0",
@@ -3308,6 +3314,10 @@ do --// UI Source
                         Name = "\0",
                         Parent = Items["ActualTitle"].Instance
                     })
+
+                    Items["Title"]:MakeDraggable(Items["MainFrame"])
+                    Items["_"]:MakeDraggable(Items["MainFrame"])
+                    Items["ActualTitle"]:MakeDraggable(Items["MainFrame"])
 
                     Window.Items = Items
                 end
@@ -4458,13 +4468,13 @@ do --// UI Source
                         Name = "\0",
                         FontFace = Library.Font,
                         TextSize = Library.FontSize,
-                        Parent = Items["Accent"].Instance,
+                        Parent = Items["RealSlider"].Instance,
                         TextColor3 = Library.Theme["Text"],
                         Text = "1871ft",
                         AnchorPoint = Vector2.new(1, 0.5),
                         Size = UDim2.new(0, 0, 0, 12),
                         BackgroundTransparency = 1,
-                        Position = UDim2.new(1, 10, 0.5, -1),
+                        Position = UDim2.new(1, -4, 0.5, -1),
                         BorderSizePixel = 0,
                         AutomaticSize = Enum.AutomaticSize.X
                     }):AddToTheme({TextColor3 = 'Text'})
