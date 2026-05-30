@@ -203,14 +203,14 @@ do --// UI Source
                 return Font.new(getcustomasset(FontPath))
             end
 
-            Library.Font = CustomFont:New("WindowsXPTAHOMA", 400, "Regular", {
-                Id = "WindowsXPTAHOMA",
+            Library.Font = CustomFont:New("PoppinsMedium", 400, "Regular", {
+                Id = "PoppinsMedium",
                 Url = "https://github.com/sametexe001/luas/raw/refs/heads/main/fonts/Poppins-Medium.ttf"
             })
 
-            Library.BoldFont = CustomFont:New("Tahoma8PTBOLD", 400, "Regular", {
-                Id = "Tahoma8PTBOLD",
-                Url = "https://github.com/sametexe001/luas/raw/refs/heads/main/fonts/TAHOMA-8PT-BOLD-WINDOWS-XP.TTF"
+            Library.BoldFont = CustomFont:New("PoppinsBold", 400, "Regular", {
+                Id = "PoppinsBold",
+                Url = "https://github.com/f-5ve/storage/raw/refs/heads/main/poppins.bold.ttf"
             })
         end
 
