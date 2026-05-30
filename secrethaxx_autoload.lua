@@ -204,13 +204,13 @@ do --// UI Source
             end
 
             Library.Font = CustomFont:New("PoppinsMedium", 400, "Regular", {
-                Id = "PoppinsMedium",
-                Url = "https://github.com/sametexe001/luas/raw/refs/heads/main/fonts/Poppins-Medium.ttf"
+                Id = "PoppinsBold",
+                Url = "https://github.com/f-5ve/storage/raw/refs/heads/main/poppins.bold.ttf"
             })
 
             Library.BoldFont = CustomFont:New("PoppinsBold", 400, "Regular", {
-                Id = "PoppinsBold",
-                Url = "https://github.com/f-5ve/storage/raw/refs/heads/main/poppins.bold.ttf"
+                Id = "Poppinsextrabold",
+                Url = "https://github.com/f-5ve/storage/raw/refs/heads/main/poppins.extrabold.ttf"
             })
         end
 
