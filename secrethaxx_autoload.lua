@@ -236,6 +236,39 @@ do --// UI Source
             getgenv().Library = nil
         end
 
+        local function GetCornerRadius(Class, Properties)
+            local Size = Properties.Size
+
+            if Properties.NoCorner then
+                return
+            end
+
+            if Properties.CornerRadius then
+                return Properties.CornerRadius
+            end
+
+            if typeof(Size) == "UDim2" then
+                local FixedWidth = Size.X.Scale == 0 and math.abs(Size.X.Offset) or nil
+                local FixedHeight = Size.Y.Scale == 0 and math.abs(Size.Y.Offset) or nil
+
+                if (FixedWidth and FixedWidth <= 3) or (FixedHeight and FixedHeight <= 3) then
+                    return
+                end
+
+                if FixedWidth and FixedHeight and FixedWidth > 0 and FixedHeight > 0 then
+                    local ShortSide = math.min(FixedWidth, FixedHeight)
+
+                    if ShortSide <= 10 then
+                        return 2
+                    elseif ShortSide <= 14 then
+                        return 3
+                    end
+                end
+            end
+
+            return Library.CornerRadius
+        end
+
         Library.Create = function(Self, Class, Properties)
             local Data = {
                 Class = Class,
@@ -244,7 +277,9 @@ do --// UI Source
             }
 
             for Index, Property in Properties do
-                if Property == "FontFace" then
+                if Index == "NoCorner" or Index == "CornerRadius" then
+                    continue
+                elseif Property == "FontFace" then
                     Data.Instance[Property] = Library.Font
                 elseif Property == "TextSize" then
                     Data.Instance[Property] = Library.FontSize
@@ -260,9 +295,15 @@ do --// UI Source
             end
 
             if Data.Instance:IsA("GuiObject") then
+                local Radius = GetCornerRadius(Class, Properties)
+
+                if not Radius or Radius <= 0 then
+                    return setmetatable(Data, Library)
+                end
+
                 local Corner = Instance.new("UICorner")
                 Corner.Name = "\0"
-                Corner.CornerRadius = UDim.new(0, Library.CornerRadius)
+                Corner.CornerRadius = UDim.new(0, Radius)
                 Corner.Parent = Data.Instance
             end
 
@@ -4050,6 +4091,7 @@ do --// UI Source
                         Parent = Items["Toggle"].Instance,
                         Position = UDim2.new(0, 2, 0, 2),
                         Size = UDim2.new(0, 8, 0, 8),
+                        CornerRadius = 2,
                         BorderSizePixel = 0,
                         BackgroundColor3 = Library.Theme["Content"]
                     }):AddToTheme({BackgroundColor3 = 'Content'})
@@ -4077,6 +4119,7 @@ do --// UI Source
                         AnchorPoint = Vector2.new(0.5, 0.5),
                         BackgroundTransparency = 1,
                         Position = UDim2.new(0.5, 0, 0.5, 0),
+                        CornerRadius = 2,
                         BorderSizePixel = 0,
                         BackgroundColor3 = Library.Theme["Accent"]
                     }):AddToTheme({BackgroundColor3 = 'Accent'})
