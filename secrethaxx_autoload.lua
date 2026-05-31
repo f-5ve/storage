@@ -51,6 +51,7 @@ do --// UI Source
         },
 
         Theme = nil,
+        KeyListVisible = true,
 
         -- Ignore below
         Threads = { },
@@ -59,6 +60,7 @@ do --// UI Source
 
         ThemingStuff = { },
         ThemeMap = { },
+        AccentTextMap = { },
 
         OpenFrames = { },
 
@@ -180,6 +182,40 @@ do --// UI Source
 
         Library.Theme = Themes.Preset
 
+        local AccentColorPattern = "rgb%(%s*84%s*,%s*0%s*,%s*255%s*%)"
+
+        Library.GetAccentRichTextColor = function(Self)
+            local Accent = Library.Theme and Library.Theme["Accent"] or Color3.fromRGB(84, 0, 255)
+
+            return string.format(
+                "rgb(%d, %d, %d)",
+                math.floor(Accent.R * 255 + 0.5),
+                math.floor(Accent.G * 255 + 0.5),
+                math.floor(Accent.B * 255 + 0.5)
+            )
+        end
+
+        Library.FormatAccentText = function(Self, Text)
+            if type(Text) ~= "string" then
+                return Text
+            end
+
+            return Text:gsub(AccentColorPattern, Library:GetAccentRichTextColor())
+        end
+
+        Library.TrackAccentText = function(Self, Object, Text)
+            if type(Text) == "string" and Text:find(AccentColorPattern) then
+                Library.AccentTextMap[Object] = Text
+            end
+        end
+
+        Library.SetObjectText = function(Self, Object, Text)
+            local RawText = tostring(Text)
+
+            Library:TrackAccentText(Object, RawText)
+            Object.Text = Library:FormatAccentText(RawText)
+        end
+
         -- Custom Font
         local CustomFont = { } do
             function CustomFont:New(Name, Weight, Style, Data)
@@ -289,6 +325,9 @@ do --// UI Source
                     Data.Instance[Property] = false
                 elseif Class == "TextButton" and Property == "Text" then
                     Data.Instance[Property] = ""
+                elseif Index == "Text" and type(Property) == "string" then
+                    Library:TrackAccentText(Data.Instance, Property)
+                    Data.Instance[Index] = Library:FormatAccentText(Property)
                 else
                     Data.Instance[Index] = Property
                 end
@@ -842,6 +881,16 @@ do --// UI Source
                         Item.Item[Property] = Color
                     elseif type(Value) == "function" then
                         Item.Item[Property] = Value()
+                    end
+                end
+            end
+
+            if Theme == "Accent" then
+                for Object, Text in Library.AccentTextMap do
+                    if Object and Object.Parent then
+                        Object.Text = Library:FormatAccentText(Text)
+                    else
+                        Library.AccentTextMap[Object] = nil
                     end
                 end
             end
@@ -2039,11 +2088,11 @@ do --// UI Source
                 end
 
                 function Watermark:SetText(Text)
-                    Items["Text"].Instance.Text = tostring(Text)
+                    Library:SetObjectText(Items["Text"].Instance, Text)
                 end
 
                 function Watermark:SetSubText(Text)
-                    Items["SubText"].Instance.Text = tostring(Text)
+                    Library:SetObjectText(Items["SubText"].Instance, Text)
                 end
 
                 function Watermark:SetVisibility(Bool)
@@ -2241,11 +2290,12 @@ do --// UI Source
                 end
 
                 function KeybindList:SetText(Text)
-                    Items["Text"].Instance.Text = tostring(Text)
+                    Library:SetObjectText(Items["Text"].Instance, Text)
                 end
 
                 function KeybindList:SetVisibility(Bool)
-                Items["KeybindList"].Instance.Visible = Bool
+                    Library.KeyListVisible = Bool
+                    Items["KeybindList"].Instance.Visible = Bool
                 end
 
                 function KeybindList:Add(Name, Mode)
@@ -2363,6 +2413,7 @@ do --// UI Source
                 end
 
                 KeybindList:Center()
+                KeybindList:SetVisibility(Library.KeyListVisible)
 
                 return setmetatable(KeybindList, Library)
             end
@@ -2546,7 +2597,7 @@ do --// UI Source
                 end
 
                 function StaffList:SetText(Text)
-                    Items["Text"].Instance.Text = tostring(Text)
+                    Library:SetObjectText(Items["Text"].Instance, Text)
                 end
 
                 function StaffList:SetVisibility(Bool)
@@ -2953,7 +3004,7 @@ do --// UI Source
                 end
 
                 function Indicator:SetText(Text)
-                    Items["Text"].Instance.Text = tostring(Text)
+                    Library:SetObjectText(Items["Text"].Instance, Text)
                 end
 
                 function Indicator:SetVisibility(Bool)
@@ -2964,7 +3015,7 @@ do --// UI Source
                     if typeof(Color) == "Color3" then
                         Items["Status"].Instance.Text = '<font color="rgb(' .. math.floor(Color.R * 255) .. ', ' .. math.floor(Color.G * 255) .. ', ' .. math.floor(Color.B * 255) .. ')">' .. tostring(Text) .. '</font>'
                     else
-                        Items["Status"].Instance.Text = tostring(Text)
+                        Library:SetObjectText(Items["Status"].Instance, Text)
                     end
                 end
 
@@ -4198,7 +4249,7 @@ do --// UI Source
                 end
 
                 function Toggle:SetText(Text)
-                    Items["Text"].Instance.Text = tostring(Text)
+                    Library:SetObjectText(Items["Text"].Instance, Text)
                 end
 
                 function Toggle:Colorpicker(Data)
@@ -4436,7 +4487,7 @@ do --// UI Source
                 end
 
                 function Button:SetText(Text)
-                    Items["Text"].Instance.Text = tostring(Text)
+                    Library:SetObjectText(Items["Text"].Instance, Text)
                 end
 
                 Items["RealButton"]:Connect("MouseButton1Down", function()
@@ -4595,7 +4646,7 @@ do --// UI Source
                 end
 
                 function Slider:SetText(Text)
-                    Items["Text"].Instance.Text = tostring(Text)
+                    Library:SetObjectText(Items["Text"].Instance, Text)
                 end
 
                 local InputChanged
@@ -4976,7 +5027,7 @@ do --// UI Source
                 end
 
                 function Dropdown:SetText(Text)
-                    Items["Text"].Instance.Text = tostring(Text)
+                    Library:SetObjectText(Items["Text"].Instance, Text)
                 end
 
                 function Dropdown:SetVisibility(Bool)
@@ -5150,7 +5201,7 @@ do --// UI Source
                 end
 
                 function Label:SetText(Text)
-                    Items["Text"].Instance.Text = tostring(Text)
+                    Library:SetObjectText(Items["Text"].Instance, Text)
                 end
 
                 function Label:Colorpicker(Data)
@@ -5314,7 +5365,7 @@ do --// UI Source
                 end
 
                 function Textbox:SetText(Text)
-                    Items["Text"].Instance.Text = tostring(Text)
+                    Library:SetObjectText(Items["Text"].Instance, Text)
                 end
 
                 function Textbox:Set(Value)
@@ -5450,6 +5501,19 @@ do --// UI Source
                             Name = "refresh",
                             Callback = function()
                                 Library:GetConfigsList(ConfigsDropdown)
+                            end
+                        })
+
+                        ConfigsSection:Toggle({
+                            Name = "hotkeys",
+                            Flag = "hotkeys_list",
+                            Default = Library.KeyListVisible,
+                            Callback = function(Value)
+                                Library.KeyListVisible = Value
+
+                                if Library.KeyList then
+                                    Library.KeyList:SetVisibility(Value)
+                                end
                             end
                         })
 
