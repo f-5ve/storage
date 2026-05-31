@@ -4650,11 +4650,20 @@ do --// UI Source
                 end
 
                 local ValueInput
+                local ValueInputClosePosition
 
                 local function CloseValueInput()
                     if ValueInput then
-                        ValueInput.Instance:Destroy()
+                        local CurrentInput = ValueInput
                         ValueInput = nil
+
+                        if ValueInputClosePosition then
+                            CurrentInput:Tween({Position = ValueInputClosePosition})
+                        end
+
+                        CurrentInput:FadeDescendants(false, function()
+                            CurrentInput.Instance:Destroy()
+                        end)
                     end
                 end
 
@@ -4678,11 +4687,15 @@ do --// UI Source
                     local RealSlider = Items["RealSlider"].Instance
                     local Width = math.clamp(RealSlider.AbsoluteSize.X, 70, 120)
                     local X = math.max(0, RealSlider.AbsolutePosition.X + RealSlider.AbsoluteSize.X - Width)
-                    local Y = RealSlider.AbsolutePosition.Y + RealSlider.AbsoluteSize.Y + 8 + GuiInset
+                    local Y = RealSlider.AbsolutePosition.Y + RealSlider.AbsoluteSize.Y + GuiInset
+                    local OpenPosition = UDim2.new(0, X, 0, Y + 10)
+
+                    ValueInputClosePosition = UDim2.new(0, X, 0, Y - 10)
 
                     ValueInput = Library:Create("TextBox", {
                         Name = "\0",
                         Parent = Library.Holder.Instance,
+                        Visible = false,
                         FontFace = Library.Font,
                         TextSize = Library.FontSize,
                         TextColor3 = Library.Theme["Text"],
@@ -4717,6 +4730,9 @@ do --// UI Source
                     ValueInput:Connect("FocusLost", function()
                         SubmitValueInput()
                     end)
+
+                    ValueInput:Tween({Position = OpenPosition})
+                    ValueInput:FadeDescendants(true)
 
                     task.defer(function()
                         if ValueInput then
