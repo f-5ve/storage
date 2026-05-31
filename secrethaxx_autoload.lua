@@ -4649,6 +4649,83 @@ do --// UI Source
                     Library:SetObjectText(Items["Text"].Instance, Text)
                 end
 
+                local ValueInput
+
+                local function CloseValueInput()
+                    if ValueInput then
+                        ValueInput.Instance:Destroy()
+                        ValueInput = nil
+                    end
+                end
+
+                local function SubmitValueInput()
+                    if not ValueInput then
+                        return
+                    end
+
+                    local Number = tonumber(ValueInput.Instance.Text)
+
+                    if Number then
+                        Slider:Set(Number)
+                    end
+
+                    CloseValueInput()
+                end
+
+                function Slider:OpenValueInput()
+                    CloseValueInput()
+
+                    local RealSlider = Items["RealSlider"].Instance
+                    local Width = math.clamp(RealSlider.AbsoluteSize.X, 70, 120)
+                    local X = math.max(0, RealSlider.AbsolutePosition.X + RealSlider.AbsoluteSize.X - Width)
+                    local Y = RealSlider.AbsolutePosition.Y + RealSlider.AbsoluteSize.Y + 8 + GuiInset
+
+                    ValueInput = Library:Create("TextBox", {
+                        Name = "\0",
+                        Parent = Library.Holder.Instance,
+                        FontFace = Library.Font,
+                        TextSize = Library.FontSize,
+                        TextColor3 = Library.Theme["Text"],
+                        Text = tostring(Slider.Value),
+                        PlaceholderText = "value",
+                        ClearTextOnFocus = false,
+                        TextXAlignment = Enum.TextXAlignment.Center,
+                        Position = UDim2.new(0, X, 0, Y),
+                        Size = UDim2.new(0, Width, 0, 18),
+                        BorderSizePixel = 0,
+                        ZIndex = Library.ZIndexOrder.OptionHolder + 5,
+                        BackgroundColor3 = Library.Theme["Inline"]
+                    }):AddToTheme({TextColor3 = "Text", BackgroundColor3 = "Inline"})
+
+                    Library:Create("UIStroke", {
+                        Name = "\0",
+                        Parent = ValueInput.Instance,
+                        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+                        LineJoinMode = Enum.LineJoinMode.Miter,
+                        Color = Library.Theme["Outline 1"]
+                    }):AddToTheme({Color = "Outline 1"})
+
+                    Library:Create("UIStroke", {
+                        Name = "\0",
+                        Parent = ValueInput.Instance,
+                        ApplyStrokeMode = Enum.ApplyStrokeMode.Border,
+                        LineJoinMode = Enum.LineJoinMode.Miter,
+                        Color = Library.Theme["Outline 3"],
+                        BorderOffset = UDim.new(0, 1)
+                    }):AddToTheme({Color = "Outline 3"})
+
+                    ValueInput:Connect("FocusLost", function()
+                        SubmitValueInput()
+                    end)
+
+                    task.defer(function()
+                        if ValueInput then
+                            ValueInput.Instance:CaptureFocus()
+                            ValueInput.Instance.CursorPosition = #ValueInput.Instance.Text + 1
+                        end
+                    end)
+                end
+
                 local InputChanged
 
                 Items["RealSlider"]:Connect("InputBegan", function(Input)
@@ -4673,6 +4750,19 @@ do --// UI Source
                         end)
                     end
                 end)
+
+                local function ConnectValueInput(Object)
+                    Object:Connect("InputBegan", function(Input)
+                        if Input.UserInputType == Enum.UserInputType.MouseButton2 then
+                            Slider:OpenValueInput()
+                        end
+                    end)
+                end
+
+                ConnectValueInput(Items["Slider"])
+                ConnectValueInput(Items["RealSlider"])
+                ConnectValueInput(Items["Value"])
+                ConnectValueInput(Items["Text"])
 
                 Library:Connect(UserInputService.InputChanged, function(Input)
                     if Input.UserInputType == Enum.UserInputType.MouseMovement or Input.UserInputType == Enum.UserInputType.Touch then
