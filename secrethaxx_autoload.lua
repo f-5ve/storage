@@ -52,6 +52,7 @@ do --// UI Source
 
         Theme = nil,
         KeyListVisible = true,
+        KeyListMode = "Active",
 
         -- Ignore below
         Threads = { },
@@ -80,7 +81,7 @@ do --// UI Source
         local ConfigName
 
         local Keys = {
-            ["Unknown"]           = "Unknown",
+            ["Unknown"]           = "None",
             ["Backspace"]         = "Back",
             ["Tab"]               = "Tab",
             ["Clear"]             = "Clear",
@@ -807,6 +808,60 @@ do --// UI Source
                 Config = Name or ""
             }))
         end
+
+        local HotkeyListModes = {
+            Active = true,
+            Toggled = true,
+            All = true
+        }
+
+        local function NormalizeHotkeyListMode(Value)
+            return HotkeyListModes[Value] and Value or "Active"
+        end
+
+        local function GetKeybindDisplayText(Key, RealKey)
+            local KeyText = tostring(RealKey or Key or "")
+            local KeyString = Keys[tostring(Key)] or Keys[KeyText] or KeyText:gsub("Enum%.", "")
+            local TextToDisplay = tostring(KeyString):gsub("KeyCode%.", ""):gsub("UserInputType%.", "")
+
+            if TextToDisplay == "" or TextToDisplay == "Unknown" or TextToDisplay == "Backspace" then
+                return "None"
+            end
+
+            return TextToDisplay
+        end
+
+        local function PreloadAutoLoadedHotkeySettings()
+            local AutoLoadEnabled, AutoLoadConfig = ReadAutoLoad()
+
+            if not AutoLoadEnabled or not AutoLoadConfig then
+                return
+            end
+
+            local ConfigPath = ConfigsFolder .. AutoLoadConfig .. ".json"
+
+            if not isfile(ConfigPath) then
+                return
+            end
+
+            local Success, Decoded = pcall(function()
+                return HttpService:JSONDecode(readfile(ConfigPath))
+            end)
+
+            if not Success or type(Decoded) ~= "table" then
+                return
+            end
+
+            if type(Decoded.hotkeys_list) == "boolean" then
+                Library.KeyListVisible = Decoded.hotkeys_list
+            end
+
+            if type(Decoded.hotkeys_mode) == "string" then
+                Library.KeyListMode = NormalizeHotkeyListMode(Decoded.hotkeys_mode)
+            end
+        end
+
+        PreloadAutoLoadedHotkeySettings()
 
         Library.GetConfigsList = function(Self, Element)
             local List = { }
@@ -1659,16 +1714,20 @@ do --// UI Source
 
                 local Update = function()
                     if KeybindObject then
+                        local ModeText
+
                         KeybindObject:Set(Data.Name, Keybind.Mode)
-                        KeybindObject:SetStatus(Keybind.Toggled)
 
                         if Keybind.Mode == "Hold" then
-                            KeybindObject:SetMode(Keybind.Toggled and "holding" or "off")
+                            ModeText = Keybind.Toggled and "holding" or "off"
                         elseif Keybind.Mode == "Always" then
-                            KeybindObject:SetMode("always on")
+                            ModeText = "always on"
                         else
-                            KeybindObject:SetMode(Keybind.Toggled and "toggled" or "off")
+                            ModeText = Keybind.Toggled and "toggled" or "off"
                         end
+
+                        KeybindObject:SetMode(ModeText)
+                        KeybindObject:SetStatus(Keybind.Toggled, Keybind.Mode)
                     end
                 end
 
@@ -1753,8 +1812,7 @@ do --// UI Source
 
                         Key = Key.Name == "Backspace" and "None" or Key.Name
 
-                        local KeyString = Keys[Keybind.Key] or string.gsub(Key, "Enum.", "") or "None"
-                        local TextToDisplay = string.gsub(string.gsub(KeyString, "KeyCode.", ""), "UserInputType.", "") or "None"
+                        local TextToDisplay = GetKeybindDisplayText(Keybind.Key, Key)
 
                         Keybind.Value = TextToDisplay
                         Items["KeyButton"].Instance.Text = TextToDisplay
@@ -1782,10 +1840,7 @@ do --// UI Source
                             Keybind:SetMode("Toggle")
                         end
 
-                        local KeyString = Keys[Keybind.Key] or string.gsub(tostring(RealKey), "Enum.", "") or RealKey
-                        local TextToDisplay = KeyString and string.gsub(string.gsub(KeyString, "KeyCode.", ""), "UserInputType.", "") or "None"
-
-                        TextToDisplay = string.gsub(string.gsub(KeyString, "KeyCode.", ""), "UserInputType.", "")
+                        local TextToDisplay = GetKeybindDisplayText(Keybind.Key, RealKey)
 
                         Keybind.Value = TextToDisplay
                         Items["KeyButton"].Instance.Text = TextToDisplay
@@ -2111,6 +2166,7 @@ do --// UI Source
                     Name = Params.Name or Params.name or 'hot<font color="rgb(84, 0, 255)">keys</font>',
 
                     Items = { },
+                    Objects = { },
                 }
 
                 Library.KeyList = KeybindList
@@ -2298,13 +2354,25 @@ do --// UI Source
                     Items["KeybindList"].Instance.Visible = Bool
                 end
 
+                function KeybindList:SetDisplayMode(Mode)
+                    Library.KeyListMode = NormalizeHotkeyListMode(Mode)
+
+                    for Index, Object in KeybindList.Objects do
+                        if Object.Refresh then
+                            Object:Refresh()
+                        end
+                    end
+                end
+
                 function KeybindList:Add(Name, Mode)
                     local NewItems = { } do
                         NewItems["NewKey"] = Library:Create("Frame", {
                             Name = "\0",
                             Parent = Items["Content"].Instance,
+                            Visible = false,
                             BackgroundTransparency = 1,
-                            Size = UDim2.new(0, 180, 0, 15),
+                            Position = UDim2.new(-1, 0, 0, 0),
+                            Size = UDim2.new(0, 0, 0, 0),
                             BorderSizePixel = 0
                         })
 
@@ -2323,6 +2391,7 @@ do --// UI Source
                             Parent = NewItems["Holder"].Instance,
                             TextColor3 = Library.Theme["Text"],
                             Text = "pause touch",
+                            TextTransparency = 1,
                             AnchorPoint = Vector2.new(0, 0.5),
                             Size = UDim2.new(0, 0, 0, 15),
                             BackgroundTransparency = 1,
@@ -2343,6 +2412,7 @@ do --// UI Source
                             Parent = NewItems["Holder"].Instance,
                             TextColor3 = Library.Theme["Inactive Text"],
                             Text = "always",
+                            TextTransparency = 1,
                             AnchorPoint = Vector2.new(1, 0.5),
                             Size = UDim2.new(0, 0, 0, 15),
                             BackgroundTransparency = 1,
@@ -2362,37 +2432,62 @@ do --// UI Source
                         NewItems["Mode"]:MakeDraggable(Items["KeybindList"])
                     end
 
-                    task.wait()
-
                     local CanBeVisible = true
-
-                    function NewItems:SetVis(Bool)
-                        CanBeVisible = Bool
-                    end
-
+                    local IsActive = false
+                    local KeybindMode = Mode or "Toggle"
+                    local IsVisible = false
                     local StateId = 0
 
-                    function NewItems:SetStatus(Bool)
+                    local function ShouldBeVisible()
+                        if not CanBeVisible then
+                            return false
+                        end
+
+                        local ListMode = NormalizeHotkeyListMode(Library.KeyListMode)
+
+                        if ListMode == "All" then
+                            return true
+                        elseif ListMode == "Toggled" then
+                            return KeybindMode == "Toggle"
+                        end
+
+                        return IsActive or KeybindMode == "Always"
+                    end
+
+                    local function SetRowVisible(Bool)
                         StateId = StateId + 1
                         local Current = StateId
-
-                        if not CanBeVisible then
-                            NewItems["NewKey"].Instance.Visible = false
-                            return
-                        end
 
                         if Bool then
                             NewItems["NewKey"].Instance.Visible = true
 
+                            if not IsVisible then
+                                NewItems["NewKey"].Instance.Size = UDim2.new(0, 0, 0, 0)
+                                NewItems["NewKey"].Instance.Position = UDim2.new(-1, 0, 0, 0)
+                                NewItems["Text"].Instance.TextTransparency = 1
+                                NewItems["Mode"].Instance.TextTransparency = 1
+                            end
+
+                            IsVisible = true
+
                             NewItems["NewKey"]:Tween({Size = UDim2.new(0, 180, 0, 15), Position = UDim2.new(0, 0, 0, 0)})
                             NewItems["Text"]:Tween({TextTransparency = 0})
                             NewItems["Mode"]:Tween({TextTransparency = 0})
+                        elseif not IsVisible then
+                            NewItems["NewKey"].Instance.Visible = false
+                            NewItems["NewKey"].Instance.Size = UDim2.new(0, 0, 0, 0)
+                            NewItems["NewKey"].Instance.Position = UDim2.new(-1, 0, 0, 0)
+                            NewItems["Text"].Instance.TextTransparency = 1
+                            NewItems["Mode"].Instance.TextTransparency = 1
+                            return
                         else
+                            IsVisible = false
+
                             Library:Thread(function()
                                 NewItems["NewKey"]:Tween({Size = UDim2.new(0, 0, 0, 0), Position = UDim2.new(-1, 0, 0, 0)})
-                                local gayporn = NewItems["Text"]:Tween({TextTransparency = 1})
+                                local FadeTween = NewItems["Text"]:Tween({TextTransparency = 1})
                                 NewItems["Mode"]:Tween({TextTransparency = 1})
-                                gayporn.Completed:Wait()
+                                FadeTween.Completed:Wait()
 
                                 if Current ~= StateId then return end
 
@@ -2401,13 +2496,34 @@ do --// UI Source
                         end
                     end
 
+                    function NewItems:Refresh()
+                        SetRowVisible(ShouldBeVisible())
+                    end
+
+                    function NewItems:SetVis(Bool)
+                        CanBeVisible = Bool
+                        NewItems:Refresh()
+                    end
+
+                    function NewItems:SetStatus(Bool, Mode)
+                        IsActive = Bool == true
+                        KeybindMode = Mode or KeybindMode
+
+                        NewItems:Refresh()
+                    end
+
                     function NewItems:Set(Name, Mode)
                         NewItems["Text"].Instance.Text = Name
+                        KeybindMode = Mode or KeybindMode
                     end
 
                     function NewItems:SetMode(Mode)
                         NewItems["Mode"].Instance.Text = Mode
                     end
+
+                    table.insert(KeybindList.Objects, NewItems)
+
+                    NewItems:Refresh()
 
                     return NewItems
                 end
@@ -5619,6 +5735,21 @@ do --// UI Source
 
                                 if Library.KeyList then
                                     Library.KeyList:SetVisibility(Value)
+                                end
+                            end
+                        })
+
+                        ConfigsSection:Dropdown({
+                            Name = "hotkey settings",
+                            Flag = "hotkeys_mode",
+                            Items = {"Active", "Toggled", "All"},
+                            Multi = false,
+                            Default = Library.KeyListMode,
+                            Callback = function(Value)
+                                Library.KeyListMode = NormalizeHotkeyListMode(Value)
+
+                                if Library.KeyList then
+                                    Library.KeyList:SetDisplayMode(Library.KeyListMode)
                                 end
                             end
                         })
