@@ -1758,6 +1758,43 @@ do --// UI Source
                 local KeyButton = Items["KeyButton"].Instance
 
                 local IsSettings = Data.Section and Data.Section.IsSettings
+                local KeybindModes = {
+                    Toggle = true,
+                    Hold = true,
+                    Always = true
+                }
+                local IsMasterToggleKeybind = Data.Toggle ~= nil and type(Data.Name) == "string" and Data.Name:sub(-8) == " Keybind"
+
+                local function NormalizeKeybindMode(Mode, Fallback)
+                    if KeybindModes[Mode] then
+                        return Mode
+                    end
+
+                    return KeybindModes[Fallback] and Fallback or "Toggle"
+                end
+
+                local function NormalizeKeyName(Key)
+                    local KeyText = tostring(Key or "")
+
+                    if typeof and typeof(Key) == "EnumItem" then
+                        return Key.Name == "Backspace" and "None" or Key.Name
+                    end
+
+                    local Name = KeyText:match("Enum%.KeyCode%.(.+)") or KeyText:match("Enum%.UserInputType%.(.+)") or KeyText
+                    if Name == "" or Name == "Unknown" or Name == "Backspace" then
+                        return "None"
+                    end
+
+                    return Name
+                end
+
+                local function SaveKeybindState()
+                    Flags[Keybind.Flag] = {
+                        Mode = Keybind.Mode,
+                        Key = Keybind.Key,
+                        Toggled = Keybind.Toggled
+                    }
+                end
 
                 function Keybind:SetOpen(Bool)
                     if Debounce then
@@ -1836,17 +1873,9 @@ do --// UI Source
                     end
                 end
 
-                function Keybind:SetMode()
-                    Flags[Keybind.Flag] = {
-                        Mode = Keybind.Mode,
-                        Key = Keybind.Key,
-                        Toggled = Keybind.Toggled
-                    }
-
-                    if Data.Callback then
-                        Library:SafeCall(Data.Callback, Keybind.Toggled)
-                    end
-
+                function Keybind:SetMode(Mode)
+                    Keybind.Mode = NormalizeKeybindMode(Mode, Keybind.Mode)
+                    SaveKeybindState()
                     Update()
                 end
 
@@ -1857,11 +1886,9 @@ do --// UI Source
                     Items = { "Toggle", "Hold", "Always" },
                     Default = "Toggle",
                     Callback = function(Value)
-                        Keybind.Mode = Value
+                        Keybind:SetMode(Value)
 
-                        Keybind:SetMode()
-
-                        if Value == "Always" then
+                        if Value == "Always" and not Library.IsLoadingConfig then
                             Keybind:Press(true)
                         end
                     end
@@ -1893,16 +1920,12 @@ do --// UI Source
                     if Keybind.Mode == "Toggle" then
                         Keybind.Toggled = not Keybind.Toggled
                     elseif Keybind.Mode == "Hold" then
-                        Keybind.Toggled = Bool
+                        Keybind.Toggled = Bool == true
                     elseif Keybind.Mode == "Always" then
                         Keybind.Toggled = true
                     end
 
-                    Flags[Keybind.Flag] = {
-                        Mode = Keybind.Mode,
-                        Key = Keybind.Key,
-                        Toggled = Keybind.Toggled
-                    }
+                    SaveKeybindState()
 
                     if Data.Callback then
                         Library:SafeCall(Data.Callback, Keybind.Toggled)
@@ -1915,53 +1938,33 @@ do --// UI Source
                     if string.find(tostring(Key), "Enum") then
                         Keybind.Key = tostring(Key)
 
-                        Key = Key.Name == "Backspace" and "None" or Key.Name
-
-                        local TextToDisplay = GetKeybindDisplayText(Keybind.Key, Key)
+                        local TextToDisplay = GetKeybindDisplayText(Keybind.Key, NormalizeKeyName(Key))
 
                         Keybind.Value = TextToDisplay
                         Items["KeyButton"].Instance.Text = TextToDisplay
 
-                        Flags[Keybind.Flag] = {
-                            Mode = Keybind.Mode,
-                            Key = Keybind.Key,
-                            Toggled = Keybind.Toggled
-                        }
-
-                        if Data.Callback then
-                            Library:SafeCall(Data.Callback, Keybind.Toggled)
-                        end
+                        SaveKeybindState()
 
                         Update()
                     elseif type(Key) == "table" then
-                        local RealKey = Key.Key == "Backspace" and "None" or Key.Key
-                        Keybind.Key = tostring(Key.Key)
+                        local ConfigKey = Key.Key or Enum.KeyCode.Unknown
+                        Keybind.Key = tostring(ConfigKey)
 
-                        if Key.Mode then
-                            Keybind.Mode = Key.Mode
-                            Keybind:SetMode(Key.Mode)
-                        else
-                            Keybind.Mode = "Toggle"
-                            Keybind:SetMode("Toggle")
+                        Keybind.Mode = NormalizeKeybindMode(Key.Mode, Keybind.Mode)
+                        if type(Key.Toggled) == "boolean" then
+                            Keybind.Toggled = Key.Toggled
                         end
 
-                        local TextToDisplay = GetKeybindDisplayText(Keybind.Key, RealKey)
+                        local TextToDisplay = GetKeybindDisplayText(Keybind.Key, NormalizeKeyName(ConfigKey))
 
                         Keybind.Value = TextToDisplay
                         Items["KeyButton"].Instance.Text = TextToDisplay
 
-                        if Data.Callback then
-                            Library:SafeCall(Data.Callback, Keybind.Toggled)
-                        end
+                        SaveKeybindState()
 
                         Update()
                     elseif table.find({"Toggle", "Hold", "Always"}, Key) then
-                        Keybind.Mode = Key
                         Keybind:SetMode(Key)
-
-                        if Data.Callback then
-                            Library:SafeCall(Data.Callback, Keybind.Toggled)
-                        end
                     end
 
                     Keybind.Picking = false
@@ -1997,7 +2000,7 @@ do --// UI Source
                         Keybind:SetOpen(false)
                     end
 
-                    if Data.Toggle and not Data.Toggle.Value then
+                    if Data.Toggle and not IsMasterToggleKeybind and not Data.Toggle.Value then
                         return
                     end
 
@@ -4463,6 +4466,14 @@ do --// UI Source
 
                     Flags[Toggle.Flag] = Bool
                     Library:SafeCall(Toggle.Callback, Bool)
+
+                    if Toggle.MasterKeybind and type(Toggle.MasterKeybind.Set) == "function" then
+                        Toggle.MasterKeybind:Set({
+                            Key = Toggle.MasterKeybind.Key ~= "" and Toggle.MasterKeybind.Key or Enum.KeyCode.Unknown,
+                            Mode = Toggle.MasterKeybind.Mode or "Toggle",
+                            Toggled = Bool == true
+                        })
+                    end
                 end
 
                 function Toggle:SetVisibility(Bool)
@@ -4526,6 +4537,10 @@ do --// UI Source
                         Mode = Keybind.Mode,
                         Callback = Keybind.Callback
                     })
+
+                    if type(Keybind.Name) == "string" and Keybind.Name:sub(-8) == " Keybind" then
+                        Toggle.MasterKeybind = NewKeybind
+                    end
 
                     return NewKeybind
                 end
