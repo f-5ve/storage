@@ -58,6 +58,9 @@ do --// UI Source
         Threads = { },
         Connections = { },
         SetFlags = { },
+        PendingConfig = { },
+        IgnoredFlags = { },
+        IsLoadingConfig = false,
 
         ThemingStuff = { },
         ThemeMap = { },
@@ -732,7 +735,9 @@ do --// UI Source
 
             local Success, Result = Library:SafeCall(function()
                 for Index, Value in Library.Flags do
-                    if type(Value) == "table" and Value.Key then
+                    if Library.IgnoredFlags[Index] then
+                        continue
+                    elseif type(Value) == "table" and Value.Key then
                         Config[Index] = {Key = tostring(Value.Key), Mode = Value.Mode}
                     elseif type(Value) == "table" and Value.Color then
                         Config[Index] = {Color = "#" .. Value.HexValue, Alpha = Value.Alpha}
@@ -750,22 +755,122 @@ do --// UI Source
             return HttpService:JSONEncode(Config)
         end
 
+        local function IsKeybindConfig(Index, Value)
+            Index = tostring(Index)
+
+            return type(Value) == "table" and Value.Key
+            or Index:sub(-12) == "ModeDropdown"
+            or Index:sub(-18) == "ShowInKeybindsList"
+            or Index:sub(-4) == "Sync"
+        end
+
+        local function GetConfigLoadPriority(Index, Value)
+            if type(Value) == "table" and Value.Color then
+                return 1
+            elseif IsKeybindConfig(Index, Value) then
+                return 2
+            elseif type(Value) == "string" then
+                return 3
+            elseif type(Value) == "number" then
+                return 4
+            elseif type(Value) == "boolean" then
+                return 5
+            end
+
+            return 6
+        end
+
+        local function ApplyConfigValue(Index, Value)
+            if Library.IgnoredFlags[Index] then
+                return
+            end
+
+            local SetFunction = Library.SetFlags[Index]
+
+            if not SetFunction then
+                Library.PendingConfig[Index] = Value
+                return
+            end
+
+            if type(Value) == "table" and Value.Key then
+                SetFunction(Value)
+            elseif type(Value) == "table" and Value.Color then
+                SetFunction(Value.Color, Value.Alpha)
+            else
+                SetFunction(Value)
+            end
+        end
+
+        Library.RegisterFlag = function(Self, Flag, SetFunction, Options)
+            if not Flag or type(SetFunction) ~= "function" then
+                return
+            end
+
+            Options = Options or { }
+
+            if Options.Save == false then
+                Library.IgnoredFlags[Flag] = true
+                Library.Flags[Flag] = nil
+                Library.PendingConfig[Flag] = nil
+                Library.SetFlags[Flag] = nil
+                return
+            end
+
+            Library.IgnoredFlags[Flag] = nil
+            Library.SetFlags[Flag] = SetFunction
+
+            if Library.PendingConfig[Flag] ~= nil then
+                local PendingValue = Library.PendingConfig[Flag]
+                Library.PendingConfig[Flag] = nil
+
+                local WasLoadingConfig = Library.IsLoadingConfig
+                Library.IsLoadingConfig = true
+                local Success, Error = pcall(function()
+                    ApplyConfigValue(Flag, PendingValue)
+                end)
+                Library.IsLoadingConfig = WasLoadingConfig
+
+                if not Success then
+                    warn("Failed to apply pending config for " .. tostring(Flag) .. ": " .. tostring(Error))
+                end
+            end
+        end
+
         Library.LoadConfig = function(Self, Config)
             local Decoded = HttpService:JSONDecode(Config)
 
             local Success, Result = Library:SafeCall(function()
-                for Index, Value in Decoded do
-                    local SetFunction = Library.SetFlags[Index]
+                local OrderedKeys = { }
 
-                    if SetFunction then
-                        if type(Value) == "table" and Value.Key then
-                            SetFunction(Value)
-                        elseif type(Value) == "table" and Value.Color then
-                            SetFunction(Value.Color, Value.Alpha)
-                        else
-                            SetFunction(Value)
-                        end
+                for Index, Value in Decoded do
+                    if not Library.IgnoredFlags[Index] then
+                        table.insert(OrderedKeys, Index)
                     end
+                end
+
+                table.sort(OrderedKeys, function(A, B)
+                    local APriority = GetConfigLoadPriority(A, Decoded[A])
+                    local BPriority = GetConfigLoadPriority(B, Decoded[B])
+
+                    if APriority == BPriority then
+                        return tostring(A) < tostring(B)
+                    end
+
+                    return APriority < BPriority
+                end)
+
+                local WasLoadingConfig = Library.IsLoadingConfig
+                Library.IsLoadingConfig = true
+                local LoadSuccess, LoadError = pcall(function()
+                    for Index, Flag in OrderedKeys do
+                        ApplyConfigValue(Flag, Decoded[Flag])
+                    end
+                end)
+
+                Library.IsLoadingConfig = WasLoadingConfig
+
+                if not LoadSuccess then
+                    error(LoadError)
                 end
             end)
 
@@ -1546,9 +1651,9 @@ do --// UI Source
                     Colorpicker:Set(Data.Default, Data.Alpha)
                 end
 
-                SetFlags[Colorpicker.Flag] = function(Value, Alpha)
+                Library:RegisterFlag(Colorpicker.Flag, function(Value, Alpha)
                     Colorpicker:Set(Value, Alpha)
-                end
+                end)
 
                 return Colorpicker, Items
             end
@@ -1952,9 +2057,9 @@ do --// UI Source
                     })
                 end
 
-                SetFlags[Keybind.Flag] = function(Value)
+                Library:RegisterFlag(Keybind.Flag, function(Value)
                     Keybind:Set(Value)
-                end
+                end)
 
                 return Keybind, Items
             end
@@ -4490,9 +4595,9 @@ do --// UI Source
 
                 Toggle:Set(Toggle.Default)
 
-                SetFlags[Toggle.Flag] = function(Value)
+                Library:RegisterFlag(Toggle.Flag, function(Value)
                     Toggle:Set(Value)
-                end
+                end)
 
                 return setmetatable(Toggle, Library)
             end
@@ -4908,9 +5013,9 @@ do --// UI Source
 
                 Slider:Set(Slider.Default)
 
-                SetFlags[Slider.Flag] = function(Value)
+                Library:RegisterFlag(Slider.Flag, function(Value)
                     Slider:Set(Value)
-                end
+                end)
 
                 return setmetatable(Slider, Library)
             end
@@ -5339,9 +5444,9 @@ do --// UI Source
 
                 Dropdown:Set(Dropdown.Default)
 
-                SetFlags[Dropdown.Flag] = function(Value)
+                Library:RegisterFlag(Dropdown.Flag, function(Value)
                     Dropdown:Set(Value)
-                end
+                end)
 
                 return setmetatable(Dropdown, Library)
             end
@@ -5498,6 +5603,8 @@ do --// UI Source
                     Finished = Params.Finished or Params.finished or false,
                     Placeholder = Params.Placeholder or Params.placeholder or "",
                     Numeric = Params.Numeric or Params.numeric or false,
+                    Save = Params.Save ~= false and Params.save ~= false,
+                    LoadCallback = Params.LoadCallback ~= false and Params.loadCallback ~= false,
 
                     Window = Self.Window,
                     Page = Self.Page,
@@ -5590,7 +5697,7 @@ do --// UI Source
                     Library:SetObjectText(Items["Text"].Instance, Text)
                 end
 
-                function Textbox:Set(Value)
+                function Textbox:Set(Value, SkipCallback)
                     if Textbox.Numeric then
                         if (not tonumber(Value)) and string.len(tostring(Value)) > 0 then
                             Value = Textbox.Value
@@ -5599,9 +5706,13 @@ do --// UI Source
 
                     Textbox.Value = Value
                     Items["Input"].Instance.Text = Value
-                    Flags[Textbox.Flag] = Value
+                    if Textbox.Save then
+                        Flags[Textbox.Flag] = Value
+                    end
 
-                    Library:SafeCall(Textbox.Callback, Value)
+                    if not SkipCallback and (not Library.IsLoadingConfig or Textbox.LoadCallback) then
+                        Library:SafeCall(Textbox.Callback, Value)
+                    end
                 end
 
                 if Textbox.Finished then
@@ -5616,11 +5727,11 @@ do --// UI Source
                     end)
                 end
 
-                Textbox:Set(Textbox.Default)
+                Textbox:Set(Textbox.Default, not Textbox.Save)
 
-                SetFlags[Textbox.Flag] = function(Value)
+                Library:RegisterFlag(Textbox.Flag, function(Value)
                     Textbox:Set(Value)
-                end
+                end, {Save = Textbox.Save})
 
                 return setmetatable(Textbox, Library)
             end
