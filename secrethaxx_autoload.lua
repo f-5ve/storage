@@ -2636,6 +2636,18 @@ do --// UI Source
                     return NewItems
                 end
 
+                function KeybindList:AddAlways(Name, ModeText)
+                    local Object = KeybindList:Add(Name or "", "Always")
+                    if Object then
+                        Object:Set(Name or "", "Always")
+                        Object:SetMode(ModeText or "always on")
+                        Object:SetStatus(true, "Always")
+                        Object:SetVis(true)
+                    end
+
+                    return Object
+                end
+
                 KeybindList:Center()
                 KeybindList:SetVisibility(Library.KeyListVisible)
 
