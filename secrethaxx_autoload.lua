@@ -4747,15 +4747,22 @@ do --// UI Source
 
             Library.Slider = function(Self, Params)
                 Params = Params or { }
+                local Min = Params.Min or Params.min or 0
+                local Max = Params.Max or Params.max or 100
+                local Decimals = Params.Decimals or Params.decimals
+
+                if Decimals == nil and Min >= -1 and Max <= 1 then
+                    Decimals = 0.001
+                end
 
                 local Slider = {
                     Name = Params.Name or Params.name or "Slider",
                     Flag = Params.Flag or Params.flag or (Params.Name or Params.name),
                     Default = Params.Default or Params.default or 0,
-                    Min = Params.Min or Params.min or 0,
-                    Max = Params.Max or Params.max or 100,
+                    Min = Min,
+                    Max = Max,
                     Callback = Params.Callback or Params.callback or function() end,
-                    Decimals = Params.Decimals or Params.decimals or 0,
+                    Decimals = Decimals or 0,
                     Suffix = Params.Suffix or Params.suffix or "",
 
                     Window = Self.Window,
