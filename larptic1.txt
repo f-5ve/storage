@@ -1,0 +1,3128 @@
+--[[
+leaked by neuro.net
+fixed a couple of errors that this retard couldnt fix
+ghosted ( larptic ) paid version from 2025
+the webhook still works while im typing this comment so spam it or fuck it idfk
+so yea this shit is pasted
+pasted/gpted by amir aka larptics owner. we have more stuff coming soon.
+]]
+local Players = game:GetService('Players')
+local LocalPlayer = Players.LocalPlayer
+local RunService = game:GetService('RunService')
+local UserInputService = game:GetService('UserInputService')
+local CurrentCamera = workspace.CurrentCamera
+local ReplicatedStorage = game:GetService('ReplicatedStorage')
+
+game:GetService('Lighting')
+
+local HttpService = game:GetService('HttpService')
+local MainEvent = ReplicatedStorage:FindFirstChild('MainEvent')
+local CFNew = CFrame.new
+local ClientId = (function()
+    return game:GetService('RbxAnalyticsService'):GetClientId()
+end)()
+local var_10, var_11, var_12 = ipairs({
+    'FAC99CBB-EBFC-46E6-B18D-266172AECB69',
+    '04E0C19B-D2B6-48B4-9A58-5F86E2E087A6',
+    'e190e77b-c907-4ab9-a5d7-e62ff8b3f551',
+    '9E908A87-9D3F-4BAD-9DB0-DD45E014833B',
+    'D430B06D-6365-4EB0-80A8-57626ED8EA4B',
+    '9AA1A470-7927-4B65-8B1C-4CBFF25494EB',
+    'BB16377A-35CC-42C3-A6AD-023C7F1C30FD',
+    'E60E57A6-FDDA-4876-AB33-27BF8974EB63',
+    'B5098530-49F4-4996-B3CF-D10902E4171B',
+}) -- using clientid is weird and hardcoding it inside the script is psycho stuff LMAO
+local BlockedExecutors = {
+    'Xeno',
+    'Solara',
+    'JJsploit',
+    'Velocity',
+    'hydrogen',
+}
+local IsWhitelisted = false
+
+while true do
+    local var_15
+
+    var_12, var_15 = var_10(var_11, var_12)
+
+    if var_12 == nil then
+        break
+    end
+    if ClientId == var_15 then
+        IsWhitelisted = true
+
+        break
+    end
+end
+
+local ConfigFileName = 'GH2STED.json'
+-- local WebhookUrl = 'https://discord.com/api/webhooks/1414247085972127814/ws8n_XJABA12-uuq5BCfTHQoBFcv4d-BeSn9y4pFK7mnwghKy6WGxd2KNJzrSRawp_ix' i commented this out so it doesnt work
+local XorKey = 'amirwasherenga1s'
+
+local function XorDecrypt(arg_19, arg_20)
+    local var_21 = bit32 and bit32.bxor or bit.bxor
+    local var_22 = {}
+
+    for var_23 = 1, #arg_19 do
+        local var_24 = arg_19:byte(var_23)
+        local var_25 = arg_20:byte((var_23 - 1) % #arg_20 + 1)
+
+        var_22[var_23] = string.char(var_21(var_24, var_25))
+    end
+
+    return table.concat(var_22)
+end
+local function RandomString(arg_27)
+    local var_28 = '7'
+    local var_29 = 'Ghosted'
+
+    for _ = 1, arg_27 do
+        var_28 = var_28 .. var_29:sub(math.random(1, #var_29), math.random(1, #var_29))
+    end
+
+    return var_28
+end
+local function SendWebhook(arg_31, arg_32)
+    local up_33 = HttpService:JSONEncode({
+        content = arg_31 == 'whitelisted' and '**paid script executed ** at ' .. os.date('%c') .. ' for ' .. LocalPlayer.Name .. ' (' .. LocalPlayer.UserId .. ') with HWID: ' .. ClientId or '**paid script (' .. arg_32 .. ') :** ' .. arg_31 .. ' at ' .. os.date('%c') .. ' for ' .. LocalPlayer.Name .. ' (' .. LocalPlayer.UserId .. ') with HWID: ' .. ClientId,
+    })
+    local up_34 = syn and syn.request or (http_request or request)
+
+    if up_34 then
+        pcall(function()
+            local var_35 = {
+                Url = WebhookUrl,
+                Method = 'POST',
+                Headers = {
+                    ['Content-Type'] = 'application/json',
+                },
+                Body = up_33,
+            }
+
+            up_34(var_35)
+        end)
+    end
+end
+local function SaveFile(arg_37, arg_38)
+    local var_39 = XorDecrypt(HttpService:JSONEncode(arg_38), XorKey)
+
+    writefile(arg_37, var_39)
+end
+local function ReadFile(arg_41)
+    if isfile(arg_41) then
+        local up_42 = XorDecrypt(readfile(arg_41), XorKey)
+        local var_43, var_44 = pcall(function()
+            return HttpService:JSONDecode(up_42)
+        end)
+
+        if var_43 then
+            return var_44
+        else
+            return nil
+        end
+    else
+        return nil
+    end
+end
+local function GetKey(arg_46, arg_47)
+    local json = ConfigFileName:gsub('.json', '_' .. arg_46 .. '.json')
+    local var_49 = false
+    local var_50
+
+    if isfile and (readfile and writefile) then
+        var_50 = ReadFile(json)
+
+        if (not var_50 or var_50.userid ~= LocalPlayer.UserId) and true or (arg_47 < os.time() - var_50.time and true or var_49) then
+            local var_51 = RandomString(12)
+
+            var_50 = {
+                key = var_51,
+                time = os.time(),
+                userid = LocalPlayer.UserId,
+            }
+
+            SaveFile(json, var_50)
+            SendWebhook(var_51, arg_46)
+        end
+    else
+        local var_52 = RandomString(12)
+
+        var_50 = {
+            key = var_52,
+            time = os.time(),
+            userid = LocalPlayer.UserId,
+        }
+
+        SendWebhook(var_52, arg_46)
+    end
+
+    return var_50
+end
+
+if (function()
+    local var_54 = getexecutorname and getexecutorname() or 'Unknown'
+    local var_55, var_56, var_57 = ipairs(BlockedExecutors)
+
+    while true do
+        local var_58
+
+        var_57, var_58 = var_55(var_56, var_57)
+
+        if var_57 == nil then
+            break
+        end
+        if var_54 == var_58 then
+            local ScreenGui = Instance.new('ScreenGui', Players.LocalPlayer:WaitForChild('PlayerGui'))
+
+            ScreenGui.Name = 'ExecutorErrorGui'
+            ScreenGui.ResetOnSpawn = false
+
+            local Frame = Instance.new('Frame', ScreenGui)
+
+            Frame.Size = UDim2.new(0, 400, 0, 150)
+            Frame.Position = UDim2.new(0.5, -200, 0.5, -75)
+            Frame.BackgroundColor3 = Color3.fromRGB(25, 25, 25)
+            Frame.BorderSizePixel = 0
+            Frame.BackgroundTransparency = 0.5
+
+            local TextLabel = Instance.new('TextLabel', Frame)
+
+            TextLabel.Size = UDim2.new(1, -20, 1, -20)
+            TextLabel.Position = UDim2.new(0, 10, 0, 10)
+            TextLabel.Text = 'Your executor (' .. var_54 .. ') is not supported. The following executors are blocked: ' .. table.concat(BlockedExecutors, ', ') .. '.'
+            TextLabel.TextColor3 = Color3.fromRGB(255, 80, 80)
+            TextLabel.BackgroundTransparency = 1
+            TextLabel.Font = Enum.Font.Gotham
+            TextLabel.TextSize = 15
+            TextLabel.TextWrapped = true
+
+            return false
+        end
+    end
+
+    return true
+end)() then
+    if IsWhitelisted then
+        SendWebhook('whitelisted', nil)
+    else
+        local key_1h = GetKey('1h', 3600)
+        local key_1w = GetKey('1w', 604800)
+        local perm = GetKey('perm', math.huge)
+        local ScreenGui2 = Instance.new('ScreenGui')
+
+        ScreenGui2.Name = 'CmdPromptUI'
+        ScreenGui2.Parent = LocalPlayer:WaitForChild('PlayerGui')
+        ScreenGui2.ResetOnSpawn = false
+
+        local Frame2 = Instance.new('Frame')
+
+        Frame2.Size = UDim2.new(0, 500, 0, 350)
+        Frame2.Position = UDim2.new(0.5, -250, 0.5, -175)
+        Frame2.BackgroundColor3 = Color3.fromRGB(0, 0, 0)
+        Frame2.BorderSizePixel = 2
+        Frame2.Parent = ScreenGui2
+
+        local TextLabel2 = Instance.new('TextLabel')
+
+        TextLabel2.Size = UDim2.new(1, -20, 1, -100)
+        TextLabel2.Position = UDim2.new(0, 10, 0, 10)
+        TextLabel2.BackgroundTransparency = 1
+        TextLabel2.TextColor3 = Color3.fromRGB(0, 255, 0)
+        TextLabel2.Font = Enum.Font.Code
+        TextLabel2.TextXAlignment = Enum.TextXAlignment.Left
+        TextLabel2.TextYAlignment = Enum.TextYAlignment.Top
+        TextLabel2.TextSize = 16
+        TextLabel2.Text = '> Please select a key duration and enter your key...\n'
+        TextLabel2.TextWrapped = true
+        TextLabel2.TextScaled = false
+        TextLabel2.Parent = Frame2
+
+        local up_68 = nil
+
+        local function var_73(arg_69, arg_70, arg_71)
+            local TextButton = Instance.new('TextButton')
+
+            TextButton.Size = UDim2.new(0, 150, 0, 30)
+            TextButton.Position = arg_70
+            TextButton.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+            TextButton.TextColor3 = Color3.fromRGB(0, 255, 0)
+            TextButton.Font = Enum.Font.Code
+            TextButton.TextSize = 14
+            TextButton.Text = arg_69
+            TextButton.Parent = Frame2
+
+            TextButton.MouseButton1Click:Connect(function()
+                up_68 = arg_71
+                TextLabel2.Text = '> duration: ' .. arg_69 .. '\n> enter your key \n'
+            end)
+
+            return TextButton
+        end
+
+        var_73('1 Hour', UDim2.new(0, 10, 1, -80), '1h')
+        var_73('1 Week', UDim2.new(0, 175, 1, -80), '1w')
+        var_73('Permanent', UDim2.new(0, 340, 1, -80), 'perm')
+
+        local TextBox = Instance.new('TextBox')
+
+        TextBox.Size = UDim2.new(1, -20, 0, 30)
+        TextBox.Position = UDim2.new(0, 10, 1, -40)
+        TextBox.BackgroundColor3 = Color3.fromRGB(20, 20, 20)
+        TextBox.TextColor3 = Color3.fromRGB(0, 255, 0)
+        TextBox.Font = Enum.Font.Code
+        TextBox.TextSize = 16
+        TextBox.PlaceholderText = 'Enter key: '
+        TextBox.Text = ''
+        TextBox.ClearTextOnFocus = true
+        TextBox.Parent = Frame2
+
+        local function up_77(arg_75)
+            for var_76 = 1, #arg_75 do
+                TextLabel2.Text = TextLabel2.Text .. arg_75:sub(var_76, var_76)
+
+                task.wait(0.03)
+            end
+
+            TextLabel2.Text = TextLabel2.Text .. '\n'
+        end
+        local function up_82()
+            if up_68 then
+                local ss = TextBox.Text:match('^%s*(.-)%s*$')
+
+                if #ss <= 50 then
+                    local var_79 = {
+                        ['1h'] = key_1h,
+                        ['1w'] = key_1w,
+                        perm = perm,
+                    }
+                    local var_80 = {
+                        ['1h'] = 3600,
+                        ['1w'] = 604800,
+                        perm = math.huge,
+                    }
+                    local var_81 = var_79[up_68]
+
+                    if var_81 then
+                        IsWhitelisted = true
+
+                        up_77('> Key accepted for ' .. up_68 .. '. Access granted.')
+                        up_77('> Welcome, ' .. LocalPlayer.Name .. '!')
+                        TextBox:Destroy()
+                        ScreenGui2:Destroy()
+                    else
+                        up_77('> Invalid selection.')
+                    end
+                else
+                    up_77('> Key too long, Please try again.')
+
+                    TextBox.Text = ''
+                end
+            else
+                up_77('> Please select a key duration first.')
+
+                TextBox.Text = ''
+
+                return
+            end
+        end
+
+        TextBox.FocusLost:Connect(function(arg_83)
+            if arg_83 and not IsWhitelisted then
+                up_82()
+            end
+        end)
+    end
+
+    wait(5)
+
+    while not IsWhitelisted do
+        task.wait()
+    end
+
+    local var_84 = 'https://raw.githubusercontent.com/violin-suzutsuki/LinoriaLib/main/'
+    local Library = loadstring(game:HttpGet(var_84 .. 'Library.lua'))()
+    local ThemeManager = loadstring(game:HttpGet(var_84 .. 'addons/ThemeManager.lua'))()
+    local SaveManager = loadstring(game:HttpGet(var_84 .. 'addons/SaveManager.lua'))()
+    local Window = Library:CreateWindow({
+        Title = 'ghosted.lol .paid version.',
+        AutoShow = true,
+        TabPadding = 7,
+        MenuFadeTime = 0.2,
+    })
+    local Tabs = {
+        Main = Window:AddTab('Rage'),
+        Character = Window:AddTab('Character'),
+        Visuals = Window:AddTab('Visuals'),
+        Misc = Window:AddTab('Misc'),
+        ['UI Settings'] = Window:AddTab('Settings'),
+    }
+    local Legit = Tabs.Main:AddLeftGroupbox('Legit')
+    local Combat = Tabs.Main:AddRightGroupbox('Combat')
+
+    if not getgenv().LegitSettings then
+        getgenv().LegitSettings = {
+            SilentAim = {
+                Enabled = false,
+                KeybindActive = false,
+                Prediction = 0.2,
+                HitPart = 'Head',
+                Keybind = Enum.KeyCode.E,
+                BodyParts = {
+                    'Head',
+                    'HumanoidRootPart',
+                    'Torso',
+                    'Left Arm',
+                    'Right Arm',
+                    'Left Leg',
+                    'Right Leg',
+                },
+                CurrentBodyPartIndex = 1,
+            },
+            Aimbot = {
+                Enabled = false,
+                KeybindActive = false,
+                Keybind = Enum.KeyCode.F,
+                Sensitivity = 0.5,
+            },
+        }
+    end
+    if not getgenv().SilentAimFOV then
+        getgenv().SilentAimFOV = {
+            Enabled = false,
+            ShowFOV = false,
+            Radius = 100,
+            Color = Color3.fromRGB(255, 255, 255),
+            Thickness = 1,
+            Transparency = 0.5,
+        }
+    end
+
+    local Circle = Drawing.new('Circle')
+
+    Circle.Visible = false
+    Circle.Radius = getgenv().SilentAimFOV.Radius or 100
+    Circle.Color = getgenv().SilentAimFOV.Color or Color3.fromRGB(255, 255, 255)
+    Circle.Thickness = getgenv().SilentAimFOV.Thickness or 1
+    Circle.Transparency = getgenv().SilentAimFOV.Transparency or 0.5
+    Circle.Filled = false
+    Circle.Position = Vector2.new(UserInputService:GetMouseLocation().X, UserInputService:GetMouseLocation().Y)
+
+    RunService.RenderStepped:Connect(function()
+        if getgenv().SilentAimFOV and getgenv().SilentAimFOV.ShowFOV then
+            Circle.Position = UserInputService:GetMouseLocation()
+            Circle.Radius = getgenv().SilentAimFOV.Radius or 100
+            Circle.Color = getgenv().SilentAimFOV.Color or Color3.fromRGB(255, 255, 255)
+            Circle.Thickness = getgenv().SilentAimFOV.Thickness or 1
+            Circle.Transparency = getgenv().SilentAimFOV.Transparency or 0.5
+            Circle.Visible = true
+        else
+            Circle.Visible = false
+        end
+    end)
+
+    local function up_106()
+        if not (getgenv().LegitSettings and (getgenv().LegitSettings.SilentAim and getgenv().SilentAimFOV)) then
+            warn('Configuration missing')
+
+            return nil
+        end
+
+        local var_93 = getgenv().SilentAimFOV.Enabled and (getgenv().SilentAimFOV.Radius or 100) or math.huge
+        local var_94 = UserInputService:GetMouseLocation()
+        local var_95 = Players
+        local var_96, var_97, var_98 = ipairs(var_95:GetPlayers())
+        local var_99 = nil
+
+        while true do
+            local var_100
+
+            var_98, var_100 = var_96(var_97, var_98)
+
+            if var_98 == nil then
+                break
+            end
+            if var_100 ~= LocalPlayer and var_100.Character then
+                local var_101 = var_100.Character:FindFirstChild(getgenv().LegitSettings.SilentAim.HitPart or 'Head')
+
+                if var_101 then
+                    local Position = var_101.Position
+
+                    if getgenv().LegitSettings.SilentAim.Prediction > 0 then
+                        Position = Position + var_101.Velocity * getgenv().LegitSettings.SilentAim.Prediction
+                    end
+
+                    local var_103, var_104 = CurrentCamera:WorldToViewportPoint(Position)
+
+                    if var_104 then
+                        local Magnitude = (var_94 - Vector2.new(var_103.X, var_103.Y)).Magnitude
+
+                        if Magnitude < var_93 then
+                            var_99 = var_101
+                            var_93 = Magnitude
+                        end
+                    end
+                end
+            end
+        end
+
+        return var_99
+    end
+
+    RunService.RenderStepped:Connect(function(arg_107)
+        local var_108 = getgenv().LegitSettings.Aimbot.Enabled and (getgenv().LegitSettings.Aimbot.KeybindActive and up_106())
+
+        if var_108 then
+            local Position2 = var_108.Position
+            local CFrame = CurrentCamera.CFrame
+            local var_111 = CFrame.new(CFrame.Position, Position2)
+            local Sensitivity = getgenv().LegitSettings.Aimbot.Sensitivity
+
+            CurrentCamera.CFrame = CFrame:Lerp(var_111, 1 - math.clamp(Sensitivity, 0, 1) ^ (arg_107 * 60))
+        end
+    end)
+    Legit:AddToggle('SilentAimToggle', {
+        Text = 'Silent Aim',
+        Default = false,
+        Tooltip = 'Toggles Silent Aim functionality',
+        Callback = function(arg_113)
+            getgenv().LegitSettings.SilentAim.Enabled = arg_113
+
+            if not arg_113 then
+                getgenv().LegitSettings.SilentAim.KeybindActive = false
+            end
+        end,
+    }):AddKeyPicker('SilentAimKeybind', {
+        Default = 'E',
+        SyncToggleState = false,
+        Mode = 'Toggle',
+        Text = 'Silent Aim',
+        NoUI = false,
+        Tooltip = 'Key to toggle Silent Aim when enabled',
+        Callback = function(arg_114)
+            if not UserInputService:GetFocusedTextBox() then
+                if getgenv().LegitSettings.SilentAim.Enabled then
+                    getgenv().LegitSettings.SilentAim.KeybindActive = arg_114
+
+                    Library:Notify('Silent Aim ' .. (arg_114 and 'activated' or 'deactivated') .. '!', 2)
+                end
+            end
+        end,
+        ChangedCallback = function(arg_115)
+            getgenv().LegitSettings.SilentAim.Keybind = arg_115
+        end,
+    })
+    Legit:AddToggle('AimbotToggle', {
+        Text = 'Aimbot',
+        Default = false,
+        Tooltip = 'Toggles Aimbot',
+        Callback = function(arg_116)
+            getgenv().LegitSettings.Aimbot.Enabled = arg_116
+
+            if not arg_116 then
+                getgenv().LegitSettings.Aimbot.KeybindActive = false
+            end
+        end,
+    }):AddKeyPicker('AimbotKeybind', {
+        Default = 'F',
+        SyncToggleState = false,
+        Mode = 'Toggle',
+        Text = 'Aimbot',
+        NoUI = false,
+        Tooltip = 'Key to toggle Aimbot when enabled',
+        Callback = function(arg_117)
+            if not UserInputService:GetFocusedTextBox() then
+                if getgenv().LegitSettings.Aimbot.Enabled then
+                    getgenv().LegitSettings.Aimbot.KeybindActive = arg_117
+
+                    Library:Notify('Aimbot ' .. (arg_117 and 'activated' or 'deactivated') .. '!', 2)
+                end
+            end
+        end,
+        ChangedCallback = function(arg_118)
+            getgenv().LegitSettings.Aimbot.Keybind = arg_118
+        end,
+    })
+    Legit:AddToggle('SilentAimFOVToggle', {
+        Text = 'Use FOV',
+        Default = false,
+        Tooltip = 'Toggles FOV restriction for Silent Aim and Aimbot',
+        Callback = function(arg_119)
+            getgenv().SilentAimFOV.Enabled = arg_119
+        end,
+    })
+    Legit:AddToggle('ShowFOVToggle', {
+        Text = 'Show FOV Circle',
+        Default = false,
+        Tooltip = 'Toggles visibility of the FOV circle',
+        Callback = function(arg_120)
+            getgenv().SilentAimFOV.ShowFOV = arg_120
+        end,
+    })
+    Legit:AddSlider('FOVRadiusSlider', {
+        Text = 'FOV Radius',
+        Default = 100,
+        Min = 10,
+        Max = 500,
+        Rounding = 0,
+        Tooltip = 'Adjusts the FOV radius for Silent Aim and Aimbot (pixels)',
+        Callback = function(arg_121)
+            getgenv().SilentAimFOV.Radius = arg_121
+        end,
+    })
+    Legit:AddSlider('PredictionSlider', {
+        Text = 'Prediction',
+        Default = 0.2,
+        Min = 0,
+        Max = 1,
+        Rounding = 2,
+        Tooltip = 'Adjusts the prediction factor for Silent Aim',
+        Callback = function(arg_122)
+            getgenv().LegitSettings.SilentAim.Prediction = arg_122
+        end,
+    })
+    Legit:AddSlider('AimbotSensitivitySlider', {
+        Text = 'Aimbot Sensitivity',
+        Default = 0.5,
+        Min = 0,
+        Max = 1,
+        Rounding = 2,
+        Tooltip = 'Adjusts the smoothness of Aimbot',
+        Callback = function(arg_123)
+            getgenv().LegitSettings.Aimbot.Sensitivity = arg_123
+        end,
+    })
+    Legit:AddDropdown('BodyPartDropdown', {
+        Text = 'Target Body Part',
+        Values = getgenv().LegitSettings.SilentAim.BodyParts,
+        Default = getgenv().LegitSettings.SilentAim.HitPart,
+        Tooltip = 'Select the body part to target for Silent Aim and Aimbot',
+        Callback = function(arg_124)
+            getgenv().LegitSettings.SilentAim.HitPart = arg_124
+
+            local var_125, var_126, var_127 = ipairs(getgenv().LegitSettings.SilentAim.BodyParts)
+
+            while true do
+                local var_128
+
+                var_127, var_128 = var_125(var_126, var_127)
+
+                if var_127 == nil then
+                    break
+                end
+                if var_128 == arg_124 then
+                    getgenv().LegitSettings.SilentAim.CurrentBodyPartIndex = var_127
+
+                    break
+                end
+            end
+        end,
+    })
+
+    local CombatSettings = {
+        Enabled = false,
+        Keybind = Enum.KeyCode.Q,
+        HitPart = 'Head',
+        Target = nil,
+        LastTargetPos = nil,
+        BlankShoots = false,
+        MaxTargetDistance = 500,
+        ToggleEnabled = false,
+    }
+    local ExcludedWeapons = {
+        ['[DoubleBarrel]'] = true,
+        ['[TacticalShotgun]'] = true,
+        ['[Shotgun]'] = true,
+    }
+    local BeamAttachment1 = nil
+    local BeamAttachment2 = nil
+    local BeamLine = nil
+
+    local function up_139()
+        if BeamAttachment1 then
+            BeamAttachment1:Destroy()
+        end
+        if BeamAttachment2 then
+            BeamAttachment2:Destroy()
+        end
+        if BeamLine then
+            BeamLine:Destroy()
+        end
+
+        BeamAttachment1 = Instance.new('Attachment')
+        BeamAttachment2 = Instance.new('Attachment')
+        BeamAttachment1.Parent = workspace.Terrain
+        BeamAttachment2.Parent = workspace.Terrain
+        BeamLine = Instance.new('Beam')
+
+        local var_134 = BeamLine
+        local var_135 = BeamAttachment1
+
+        BeamLine.Attachment1 = BeamAttachment2
+        var_134.Attachment0 = var_135
+
+        local var_136 = BeamLine
+        local var_137 = BeamLine
+
+        BeamLine.LightInfluence = 0
+        var_137.LightEmission = 1
+        var_136.FaceCamera = true
+
+        local var_138 = BeamLine
+
+        BeamLine.Width1 = 0.1
+        var_138.Width0 = 0.15
+        BeamLine.Texture = 'rbxassetid://1217127707'
+        BeamLine.TextureLength = 10
+        BeamLine.TextureMode = Enum.TextureMode.Wrap
+        BeamLine.Transparency = NumberSequence.new(0.2)
+        BeamLine.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255))
+        BeamLine.Enabled = false
+        BeamLine.Parent = workspace
+    end
+    local function var_140(_)
+        up_139()
+    end
+
+    if LocalPlayer.Character then
+        var_140(LocalPlayer.Character)
+    end
+
+    LocalPlayer.CharacterAdded:Connect(var_140)
+
+    local function GetCurrentTool()
+        local Character = LocalPlayer.Character
+
+        if Character then
+            Character = Character:FindFirstChildOfClass('Tool')
+        end
+
+        return Character
+    end
+    local function GetNearestTarget()
+        local var_143 = GetCurrentTool()
+
+        if var_143 and ExcludedWeapons[var_143.Name] then
+            return nil
+        end
+
+        local var_144 = UserInputService:GetMouseLocation()
+        local huge = math.huge
+        local Position3 = CurrentCamera.CFrame.Position
+        local var_147 = Players
+        local var_148, var_149, var_150 = ipairs(var_147:GetPlayers())
+        local var_151 = nil
+
+        while true do
+            local var_152
+
+            var_150, var_152 = var_148(var_149, var_150)
+
+            if var_150 == nil then
+                break
+            end
+            if var_152 ~= LocalPlayer and var_152.Character and var_152.Character:FindFirstChild(CombatSettings.HitPart) then
+                local var_153 = var_152.Character[CombatSettings.HitPart]
+
+                if (var_153.Position - Position3).Magnitude <= CombatSettings.MaxTargetDistance then
+                    local var_154, var_155 = CurrentCamera:WorldToViewportPoint(var_153.Position)
+
+                    if var_155 then
+                        local Magnitude2 = (Vector2.new(var_154.X, var_154.Y) - var_144).Magnitude
+
+                        if Magnitude2 < huge then
+                            var_151 = var_152
+                            huge = Magnitude2
+                        end
+                    end
+                end
+            end
+        end
+
+        return var_151
+    end
+    local function GetMousePos()
+        local var_158 = UserInputService:GetMouseLocation()
+
+        return CurrentCamera:ViewportPointToRay(var_158.X, var_158.Y, 2).Origin
+    end
+
+    local OldNamecall = nil
+
+    OldNamecall = hookmetamethod(game, '__namecall', function(arg_161, ...)
+        local var_162 = {...}
+
+        if not CombatSettings.Enabled or (not CombatSettings.ToggleEnabled or (arg_161 ~= MainEvent or (getnamecallmethod() ~= 'FireServer' or var_162[1] ~= 'Shoot'))) then
+            return OldNamecall(arg_161, ...)
+        end
+
+        local var_163 = GetCurrentTool()
+        local Target = CombatSettings.Target
+
+        if var_163 and ExcludedWeapons[var_163.Name] then
+            return OldNamecall(arg_161, ...)
+        end
+
+        local var_165 = Target and Target.Character
+
+        if var_165 then
+            var_165 = Target.Character:FindFirstChild(CombatSettings.HitPart)
+        end
+
+        local var_166 = var_165 and var_165.Position or CombatSettings.LastTargetPos
+
+        if var_163 and var_166 then
+            MainEvent:FireServer('MousePosUpdate', {
+                thePart = var_165 or {Position = var_166},
+                theOffset = Vector3.new(),
+            }, var_166, Vector3.zero)
+
+            if type(var_162[2]) == 'table' then
+                var_162[2][6] = var_163
+            end
+
+            local var_167, var_168, var_169 = ipairs(var_162[2][1])
+
+            while true do
+                local var_170
+
+                var_169, var_170 = var_167(var_168, var_169)
+
+                if var_169 == nil then
+                    break
+                end
+
+                var_170.Normal = Vector3.new(0, 0, -1)
+                var_170.Position = var_166
+                var_170.Instance = var_165 or {Position = var_166}
+            end
+
+            local var_171, var_172, var_173 = ipairs(var_162[2][2])
+
+            while true do
+                local var_174
+
+                var_173, var_174 = var_171(var_172, var_173)
+
+                if var_173 == nil then
+                    break
+                end
+
+                var_174.theOffset = Vector3.new()
+                var_174.thePart = var_165 or {Position = var_166}
+            end
+
+            local var_175 = var_162[2]
+            local var_176 = var_162[2]
+            local var_177 = var_162[2]
+            local var_178 = LocalPlayer.Character and (LocalPlayer.Character.Head and LocalPlayer.Character.Head.Position) or CurrentCamera.CFrame.Position
+
+            var_177[5] = tick()
+            var_176[4] = var_166
+            var_175[3] = var_178
+        end
+
+        return OldNamecall(arg_161, unpack(var_162))
+    end)
+
+    local SoundEnabled = true
+
+    CombatSettings.WallCheck = true
+
+    Combat:AddToggle('ForceHitToggle', {
+        Text = 'Force Hit',
+        Default = CombatSettings.ToggleEnabled,
+        Tooltip = 'Toggles Force Hit functionality',
+        Callback = function(arg_180)
+            CombatSettings.ToggleEnabled = arg_180
+
+            if arg_180 then
+                if CombatSettings.Enabled then
+                    CombatSettings.Target = GetNearestTarget()
+
+                    if CombatSettings.Target and CombatSettings.Target.Character and CombatSettings.Target.Character:FindFirstChild(CombatSettings.HitPart) then
+                        CombatSettings.LastTargetPos = CombatSettings.Target.Character[CombatSettings.HitPart].Position
+                    end
+                    if CombatSettings.Target and CombatSettings.BlankShoots then
+                        startRapidFire()
+                    end
+                end
+            else
+                CombatSettings.Enabled = false
+                CombatSettings.Target = nil
+                CombatSettings.LastTargetPos = nil
+                BeamLine.Enabled = false
+
+                stopRapidFire()
+            end
+
+            return CombatSettings.ToggleEnabled and 'Force Hit enabled' or 'Force Hit disabled'
+        end,
+    })
+    Combat:AddToggle('rapidfiresound', {
+        Text = 'Rapid Fire Sound',
+        Default = SoundEnabled,
+        Tooltip = 'Toggles rapid fire sound',
+        Callback = function(arg_181)
+            SoundEnabled = arg_181
+
+            return SoundEnabled and 'Sound enabled' or 'Sound disabled'
+        end,
+    })
+    Combat:AddToggle('WallCheckToggle', {
+        Text = 'Wall Check',
+        Default = CombatSettings.WallCheck,
+        Tooltip = 'Toggles wall check for rapid fire (if disabled, shoots through walls)',
+        Callback = function(arg_182)
+            CombatSettings.WallCheck = arg_182
+
+            return CombatSettings.WallCheck and 'Wall check enabled' or 'Wall check disabled'
+        end,
+    })
+
+    local function up_201()
+        if rapidFireConnection then
+            rapidFireConnection:Disconnect()
+
+            rapidFireConnection = nil
+        end
+
+        rapidFireConnection = RunService.Heartbeat:Connect(function()
+            if CombatSettings.Enabled and (CombatSettings.ToggleEnabled and (CombatSettings.BlankShoots and CombatSettings.Target)) then
+                local var_183 = GetCurrentTool()
+                local Target2 = CombatSettings.Target
+                local var_185
+
+                if Target2 then
+                    var_185 = Target2.Character
+                else
+                    var_185 = Target2
+                end
+
+                local var_186
+
+                if var_185 then
+                    var_186 = var_185:FindFirstChild(CombatSettings.HitPart)
+                else
+                    var_186 = var_185
+                end
+
+                local var_187 = var_186 and var_186.Position or CombatSettings.LastTargetPos
+
+                if var_185 and var_185:FindFirstChildOfClass('ForceField') then
+                    return
+                end
+                if var_183 and (var_187 and not ExcludedWeapons[var_183.Name]) then
+                    local var_188 = LocalPlayer.Character and (LocalPlayer.Character:FindFirstChild('Head') and LocalPlayer.Character.Head.Position) or CurrentCamera.CFrame.Position
+
+                    if (var_188 - var_187).Magnitude <= 160 then
+                        local var_189
+
+                        if CombatSettings.WallCheck then
+                            local var_190 = var_187 - var_188
+                            local var_191 = RaycastParams.new()
+
+                            var_191.FilterDescendantsInstances = {
+                                LocalPlayer.Character,
+                                Target2 and (Target2.Character or {}) or {},
+                            }
+                            var_191.FilterType = Enum.RaycastFilterType.Blacklist
+
+                            local var_192 = workspace:Raycast(var_188, var_190, var_191)
+
+                            var_189 = var_192 and (var_192.Instance and (Target2 and Target2.Character))
+
+                            if var_189 then
+                                var_189 = var_192.Instance:IsDescendantOf(Target2.Character)
+                            end
+                        else
+                            var_189 = true
+                        end
+                        if var_189 then
+                            local var_193 = {
+                                {
+                                    {
+                                        Instance = var_186 or {Position = var_187},
+                                        Position = var_187,
+                                        Normal = Vector3.new(0, 0, -1),
+                                    },
+                                },
+                                {
+                                    {
+                                        thePart = var_186 or {Position = var_187},
+                                        theOffset = Vector3.new(),
+                                    },
+                                },
+                                var_188,
+                                var_187,
+                                tick(),
+                                var_183,
+                            }
+
+                            MainEvent:FireServer('MousePosUpdate', {
+                                thePart = var_186 or {Position = var_187},
+                                theOffset = Vector3.new(),
+                            }, var_187, Vector3.zero)
+                            MainEvent:FireServer('Shoot', var_193)
+
+                            if CombatSettings.BlankShoots then
+                                local var_194 = var_183:FindFirstChild('Muzzle') or (var_183:FindFirstChild('Barrel') or var_183:FindFirstChild('Handle'))
+                                local var_195 = var_194 and var_194.Position or var_188 + (var_187 - var_188).Unit * 2
+                                local Attachment = Instance.new('Attachment')
+                                local Attachment2 = Instance.new('Attachment')
+
+                                Attachment.Position = var_195
+                                Attachment2.Position = var_187
+                                Attachment.Parent = workspace.Terrain
+                                Attachment2.Parent = workspace.Terrain
+
+                                local Beam = Instance.new('Beam')
+
+                                Beam.Texture = 'rbxasset://textures/particles/sparkles_main.dds'
+                                Beam.LightEmission = 1
+                                Beam.LightInfluence = 0
+                                Beam.Color = ColorSequence.new(Color3.fromRGB(255, 255, 255))
+                                Beam.Width0 = 0.1
+                                Beam.Width1 = 0.1
+                                Beam.Transparency = NumberSequence.new(0)
+                                Beam.Attachment0 = Attachment
+                                Beam.Attachment1 = Attachment2
+                                Beam.Parent = workspace.Terrain
+
+                                if SoundEnabled then
+                                    local Sound = Instance.new('Sound')
+
+                                    Sound.SoundId = 'rbxassetid://4817809188'
+                                    Sound.Volume = 0.1
+                                    Sound.PlaybackSpeed = 1
+                                    Sound.Parent = workspace
+
+                                    local var_200 = Sound
+
+                                    Sound.Play(var_200)
+                                    task.delay(0.9, function()
+                                        Beam:Destroy()
+                                        Attachment:Destroy()
+                                        Attachment2:Destroy()
+                                        Sound:Destroy()
+                                    end)
+                                else
+                                    task.delay(0.9, function()
+                                        Beam:Destroy()
+                                        Attachment:Destroy()
+                                        Attachment2:Destroy()
+                                    end)
+                                end
+                            end
+                        end
+                    end
+                end
+            end
+        end)
+    end
+    local function up_202()
+        if rapidFireConnection then
+            rapidFireConnection:Disconnect()
+
+            rapidFireConnection = nil
+        end
+    end
+
+    RunService.RenderStepped:Connect(function()
+        if CombatSettings.Enabled and CombatSettings.ToggleEnabled then
+            local Target3 = CombatSettings.Target
+            local var_204 = Target3 and Target3.Character
+
+            if var_204 then
+                var_204 = Target3.Character:FindFirstChild(CombatSettings.HitPart)
+            end
+
+            local var_205 = var_204 and var_204.Position or CombatSettings.LastTargetPos
+
+            if var_205 then
+                BeamAttachment1.Position = GetMousePos()
+                BeamAttachment2.Position = var_205
+                BeamLine.Enabled = true
+
+                if var_204 then
+                    CombatSettings.LastTargetPos = var_204.Position
+                end
+            else
+                BeamLine.Enabled = false
+                CombatSettings.Target = GetNearestTarget()
+
+                if CombatSettings.Target and CombatSettings.Target.Character and CombatSettings.Target.Character:FindFirstChild(CombatSettings.HitPart) then
+                    CombatSettings.LastTargetPos = CombatSettings.Target.Character[CombatSettings.HitPart].Position
+                end
+                if CombatSettings.Target then
+                    if CombatSettings.BlankShoots then
+                        up_201()
+                    end
+                else
+                    CombatSettings.Enabled = false
+
+                    up_202()
+                    Notifications:Notify({
+                        Title = 'Force Hit',
+                        Description = 'Target lost, searching for new target...',
+                        Duration = 3,
+                    })
+                end
+            end
+        else
+            BeamLine.Enabled = false
+        end
+    end)
+    Combat:AddLabel('Force Hit Keybind'):AddKeyPicker('ForceHitKeybind', {
+        Text = 'Force Hit Keybind',
+        Default = CombatSettings.Keybind.Name,
+        SyncToggleState = true,
+        Mode = 'Toggle',
+        NoUI = false,
+        Tooltip = 'Select the key to choose a target for Force Hit',
+        Callback = function(arg_206)
+            if CombatSettings.ToggleEnabled then
+                CombatSettings.Enabled = arg_206
+
+                if arg_206 then
+                    CombatSettings.Target = GetNearestTarget()
+
+                    if CombatSettings.Target and CombatSettings.Target.Character and CombatSettings.Target.Character:FindFirstChild(CombatSettings.HitPart) then
+                        CombatSettings.LastTargetPos = CombatSettings.Target.Character[CombatSettings.HitPart].Position
+
+                        if CombatSettings.BlankShoots then
+                            up_201()
+                        end
+                    else
+                        CombatSettings.Enabled = false
+
+                        Notifications:Notify({
+                            Title = 'Force Hit',
+                            Description = 'No valid target found!',
+                            Duration = 3,
+                        })
+                    end
+                else
+                    CombatSettings.Target = nil
+                    CombatSettings.LastTargetPos = nil
+                    BeamLine.Enabled = false
+
+                    up_202()
+                end
+            end
+        end,
+        ChangedCallback = function(arg_207)
+            CombatSettings.Keybind = arg_207
+        end,
+    })
+    Combat:AddToggle('BlankShootsToggle', {
+        Text = 'Rapid Fire',
+        Default = CombatSettings.BlankShoots,
+        Tooltip = 'Toggles rapid-fire shooting that still damages targets',
+        Callback = function(arg_208)
+            CombatSettings.BlankShoots = arg_208
+
+            if arg_208 and (CombatSettings.Enabled and (CombatSettings.ToggleEnabled and CombatSettings.Target)) then
+                up_201()
+            else
+                up_202()
+
+                if CombatSettings.Enabled then
+                    CombatSettings.Target = GetNearestTarget()
+
+                    if not CombatSettings.Target then
+                        CombatSettings.Enabled = false
+
+                        Notifications:Notify({
+                            Title = 'Force Hit',
+                            Description = 'No valid target found!',
+                            Duration = 3,
+                        })
+                    end
+                end
+            end
+        end,
+    })
+    Options.ForceHitKeybind:SetValue({
+        'Q',
+        'Toggle',
+    })
+
+    local Menu = Tabs['UI Settings']:AddLeftGroupbox('Menu')
+
+    getgenv().espEnabled = false
+    getgenv().espColor = Color3.new(1, 1, 1)
+    getgenv().nameESPEnabled = false
+    getgenv().nameColor = Color3.new(1, 1, 1)
+    getgenv().nameDisplayMode = 'Username'
+    getgenv().nameTextSize = 14
+    getgenv().studsESPEnabled = false
+    getgenv().distanceColor = Color3.new(1, 1, 1)
+    getgenv().distanceTextSize = 14
+    getgenv().healthBarESP = false
+    getgenv().healthBarColor = Color3.new(0, 1, 0)
+    getgenv().weaponESPEnabled = false
+    getgenv().weaponColor = Color3.new(1, 1, 1)
+    getgenv().armorBarESP = false
+    getgenv().armorBarColor = Color3.new(0, 0, 1)
+    getgenv().outlineEnabled = false
+
+    local ESPFonts = {SourceSans = 0}
+    local ESPObjects = {}
+    local CurrentCamera2 = workspace.CurrentCamera
+
+    local function RemoveESP(arg_213)
+        if ESPObjects[arg_213] then
+            local var_214, var_215, var_216 = pairs(ESPObjects[arg_213])
+
+            while true do
+                local var_217
+
+                var_216, var_217 = var_214(var_215, var_216)
+
+                if var_216 == nil then
+                    break
+                end
+
+                var_217:Remove()
+            end
+
+            ESPObjects[arg_213] = nil
+        end
+    end
+    local function CreateESP(arg_219)
+        RemoveESP(arg_219)
+
+        local Square = Drawing.new('Square')
+
+        Square.Thickness = 1
+        Square.Filled = false
+        Square.Color = getgenv().espColor
+        Square.Visible = false
+        Square.ZIndex = 1
+
+        local Square2 = Drawing.new('Square')
+
+        Square2.Thickness = 3
+        Square2.Filled = false
+        Square2.Color = Color3.new(0, 0, 0)
+        Square2.Visible = false
+        Square2.ZIndex = 0
+
+        local Text = Drawing.new('Text')
+
+        Text.Size = getgenv().nameTextSize
+        Text.Center = true
+        Text.Color = getgenv().nameColor
+        Text.Visible = false
+        Text.Font = ESPFonts.SourceSans
+        Text.Outline = getgenv().outlineEnabled
+        Text.OutlineColor = Color3.new(0, 0, 0)
+
+        local Text2 = Drawing.new('Text')
+
+        Text2.Size = getgenv().distanceTextSize
+        Text2.Center = true
+        Text2.Color = getgenv().distanceColor
+        Text2.Visible = false
+        Text2.Font = ESPFonts.SourceSans
+        Text2.Outline = getgenv().outlineEnabled
+        Text2.OutlineColor = Color3.new(0, 0, 0)
+
+        local Square3 = Drawing.new('Square')
+
+        Square3.Thickness = 1
+        Square3.Filled = true
+        Square3.Color = getgenv().healthBarColor
+        Square3.Visible = false
+        Square3.ZIndex = 1
+
+        local Square4 = Drawing.new('Square')
+
+        Square4.Thickness = 3
+        Square4.Filled = false
+        Square4.Color = Color3.new(0, 0, 0)
+        Square4.Visible = false
+        Square4.ZIndex = 0
+
+        local Text3 = Drawing.new('Text')
+
+        Text3.Size = getgenv().nameTextSize
+        Text3.Center = true
+        Text3.Color = getgenv().weaponColor
+        Text3.Visible = false
+        Text3.Font = ESPFonts.SourceSans
+        Text3.Outline = getgenv().outlineEnabled
+        Text3.OutlineColor = Color3.new(0, 0, 0)
+
+        local Square5 = Drawing.new('Square')
+
+        Square5.Thickness = 1
+        Square5.Filled = true
+        Square5.Color = getgenv().armorBarColor
+        Square5.Visible = false
+        Square5.ZIndex = 1
+
+        local Square6 = Drawing.new('Square')
+
+        Square6.Thickness = 3
+        Square6.Filled = false
+        Square6.Color = Color3.new(0, 0, 0)
+        Square6.Visible = false
+        Square6.ZIndex = 0
+        ESPObjects[arg_219] = {
+            Box = Square,
+            BoxOutline = Square2,
+            Username = Text,
+            Distance = Text2,
+            HealthBar = Square3,
+            HealthBarOutline = Square4,
+            Weapon = Text3,
+            ArmorBar = Square5,
+            ArmorBarOutline = Square6,
+        }
+    end
+    local function var_268()
+        if getgenv().espEnabled and (ESPObjects and (CurrentCamera2 and LocalPlayer)) then
+            local var_230, var_231, var_232 = pairs(ESPObjects)
+
+            while true do
+                local var_233
+
+                var_232, var_233 = var_230(var_231, var_232)
+
+                if var_232 == nil then
+                    break
+                end
+                if var_232 == LocalPlayer or not var_232.Character then
+                    local var_234, var_235, var_236 = pairs(var_233)
+
+                    while true do
+                        local var_237
+
+                        var_236, var_237 = var_234(var_235, var_236)
+
+                        if var_236 == nil then
+                            break
+                        end
+
+                        var_237.Visible = false
+                    end
+                else
+                    local Character2 = var_232.Character
+                    local HumanoidRootPart = Character2:FindFirstChild('HumanoidRootPart')
+                    local Humanoid = Character2:FindFirstChildOfClass('Humanoid')
+
+                    if HumanoidRootPart and (Humanoid and Humanoid.Health > 0) then
+                        if getgenv().teamCheck and var_232.Team == LocalPlayer.Team then
+                            local var_241, var_242, var_243 = pairs(var_233)
+
+                            while true do
+                                local var_244
+
+                                var_243, var_244 = var_241(var_242, var_243)
+
+                                if var_243 == nil then
+                                    break
+                                end
+
+                                var_244.Visible = false
+                            end
+                        else
+                            local var_245, var_246 = CurrentCamera2:WorldToViewportPoint(HumanoidRootPart.Position)
+
+                            if var_246 then
+                                local var_247 = CurrentCamera2:WorldToViewportPoint(HumanoidRootPart.Position + Vector3.new(0, getgenv().headOffset or 3, 0))
+                                local var_248 = CurrentCamera2:WorldToViewportPoint(HumanoidRootPart.Position - Vector3.new(0, getgenv().footOffset or 3, 0))
+                                local var_249 = math.abs(var_247.Y - var_248.Y)
+                                local var_250 = var_249 / 2
+
+                                var_233.Box.Position = Vector2.new(var_245.X - var_250 / 2, var_247.Y)
+                                var_233.Box.Size = Vector2.new(var_250, var_249)
+                                var_233.Box.Color = getgenv().espColor or Color3.new(1, 1, 1)
+                                var_233.Box.Visible = true
+                                var_233.BoxOutline.Position = var_233.Box.Position
+                                var_233.BoxOutline.Size = var_233.Box.Size
+                                var_233.BoxOutline.Visible = getgenv().outlineEnabled or false
+
+                                if getgenv().nameESPEnabled then
+                                    local var_251 = nil
+                                    local var_252 = getgenv().nameDisplayMode or 'Username'
+
+                                    if var_252 == 'Username' then
+                                        var_251 = var_232.Name
+                                    elseif var_252 == 'DisplayName' then
+                                        var_251 = var_232.DisplayName or var_232.Name
+                                    elseif var_252 == 'Username (DisplayName)' then
+                                        var_251 = string.format('%s (%s)', var_232.Name, var_232.DisplayName or var_232.Name)
+                                    elseif var_252 == 'Username (DisplayName) [UserID]' then
+                                        var_251 = string.format('%s (%s) [%d]', var_232.Name, var_232.DisplayName or var_232.Name, var_232.UserId)
+                                    end
+
+                                    var_233.Username.Position = Vector2.new(var_245.X, var_247.Y - (getgenv().nameOffset or 15))
+                                    var_233.Username.Text = var_251
+                                    var_233.Username.Size = getgenv().nameTextSize or 18
+                                    var_233.Username.Font = ESPFonts and ESPFonts.SourceSans or Enum.Font.SourceSans
+                                    var_233.Username.Color = getgenv().nameColor or Color3.new(1, 1, 1)
+                                    var_233.Username.Outline = getgenv().outlineEnabled or false
+                                    var_233.Username.Visible = true
+                                else
+                                    var_233.Username.Visible = false
+                                end
+                                if getgenv().studsESPEnabled then
+                                    local var_253 = math.floor(LocalPlayer.Character and (LocalPlayer.Character.HumanoidRootPart and (LocalPlayer.Character.HumanoidRootPart.Position - HumanoidRootPart.Position).Magnitude) or 0)
+
+                                    var_233.Distance.Position = Vector2.new(var_245.X, var_248.Y + (getgenv().distanceOffset or 5))
+                                    var_233.Distance.Text = var_253 .. ' studs'
+                                    var_233.Distance.Size = getgenv().distanceTextSize or 18
+                                    var_233.Distance.Font = ESPFonts and ESPFonts.SourceSans or Enum.Font.SourceSans
+                                    var_233.Distance.Color = getgenv().distanceColor or Color3.new(1, 1, 1)
+                                    var_233.Distance.Outline = getgenv().outlineEnabled or false
+                                    var_233.Distance.Visible = true
+                                else
+                                    var_233.Distance.Visible = false
+                                end
+                                if getgenv().healthBarESP then
+                                    local var_254 = var_249 * (Humanoid.Health / Humanoid.MaxHealth)
+
+                                    var_233.HealthBar.Position = Vector2.new(var_245.X - var_250 / 2 - (getgenv().healthBarOffset or 6), var_247.Y + (var_249 - var_254))
+                                    var_233.HealthBar.Size = Vector2.new(3, var_254)
+                                    var_233.HealthBar.Color = getgenv().healthBarColor or Color3.new(0, 1, 0)
+                                    var_233.HealthBar.Visible = true
+                                    var_233.HealthBarOutline.Position = var_233.HealthBar.Position
+                                    var_233.HealthBarOutline.Size = var_233.HealthBar.Size
+                                    var_233.HealthBarOutline.Visible = getgenv().outlineEnabled or false
+                                else
+                                    var_233.HealthBar.Visible = false
+                                    var_233.HealthBarOutline.Visible = false
+                                end
+                                if getgenv().weaponESPEnabled then
+                                    local Tool = Character2:FindFirstChildOfClass('Tool')
+
+                                    var_233.Weapon.Position = Vector2.new(var_245.X, var_248.Y + (getgenv().weaponOffset or 20))
+                                    var_233.Weapon.Text = Tool and (Tool.Name or 'None') or 'None'
+                                    var_233.Weapon.Size = getgenv().nameTextSize or 18
+                                    var_233.Weapon.Font = ESPFonts and ESPFonts.SourceSans or Enum.Font.SourceSans
+                                    var_233.Weapon.Color = getgenv().weaponColor or Color3.new(1, 1, 1)
+                                    var_233.Weapon.Outline = getgenv().outlineEnabled or false
+                                    var_233.Weapon.Visible = Tool and true or false
+                                else
+                                    var_233.Weapon.Visible = false
+                                end
+                                if getgenv().armorBarESP then
+                                    local var_256 = getgenv().maxArmor or 100
+                                    local DataFolder = var_232:FindFirstChild('DataFolder')
+                                    local var_258 = not (DataFolder and DataFolder:FindFirstChild('Information') and DataFolder.Information:FindFirstChild('ArmorSave')) and 0 or DataFolder.Information.ArmorSave.Value
+                                    local var_259 = var_249 * (var_258 / var_256)
+
+                                    var_233.ArmorBar.Position = Vector2.new(var_245.X + var_250 / 2 + (getgenv().armorBarOffset or 3), var_247.Y + (var_249 - var_259))
+                                    var_233.ArmorBar.Size = Vector2.new(3, var_259)
+                                    var_233.ArmorBar.Color = getgenv().armorBarColor or Color3.new(0, 0.5, 1)
+                                    var_233.ArmorBar.Visible = var_258 > 0
+                                    var_233.ArmorBarOutline.Position = var_233.ArmorBar.Position
+                                    var_233.ArmorBarOutline.Size = var_233.ArmorBar.Size
+                                    var_233.ArmorBarOutline.Visible = 0 < var_258 and getgenv().outlineEnabled or false
+                                else
+                                    var_233.ArmorBar.Visible = false
+                                    var_233.ArmorBarOutline.Visible = false
+                                end
+                            else
+                                local var_260, var_261, var_262 = pairs(var_233)
+
+                                while true do
+                                    local var_263
+
+                                    var_262, var_263 = var_260(var_261, var_262)
+
+                                    if var_262 == nil then
+                                        break
+                                    end
+
+                                    var_263.Visible = false
+                                end
+                            end
+                        end
+                    else
+                        local var_264, var_265, var_266 = pairs(var_233)
+
+                        while true do
+                            local var_267
+
+                            var_266, var_267 = var_264(var_265, var_266)
+
+                            if var_266 == nil then
+                                break
+                            end
+
+                            var_267.Visible = false
+                        end
+                    end
+                end
+            end
+        end
+    end
+
+    function applyESP()
+        local var_269, var_270, var_271 = pairs(ESPObjects)
+
+        while true do
+            local var_272
+
+            var_271, var_272 = var_269(var_270, var_271)
+
+            if var_271 == nil then
+                break
+            end
+
+            var_272.Box.Visible = getgenv().espEnabled
+
+            local BoxOutline = var_272.BoxOutline
+            local outlineEnabled = getgenv().outlineEnabled
+
+            if outlineEnabled then
+                outlineEnabled = getgenv().espEnabled
+            end
+
+            BoxOutline.Visible = outlineEnabled
+        end
+    end
+
+    Players.PlayerAdded:Connect(function(arg_275)
+        arg_275.CharacterAdded:Connect(function()
+            wait(1)
+            CreateESP(arg_275)
+        end)
+    end)
+    Players.PlayerRemoving:Connect(RemoveESP)
+
+    local var_276, var_277, var_278 = pairs(Players:GetPlayers())
+    local var_279 = CreateESP
+
+    while true do
+        local var_280, var_281 = var_276(var_277, var_278)
+
+        if var_280 == nil then
+            break
+        end
+
+        var_278 = var_280
+
+        if var_281 ~= LocalPlayer then
+            var_279(var_281)
+        end
+    end
+
+    RunService.RenderStepped:Connect(var_268)
+
+    local ESP = Tabs.Visuals:AddLeftGroupbox('ESP')
+
+    ESP:AddToggle('ESPEnabled', {
+        Text = 'Enable',
+        Default = false,
+        Callback = function(arg_283)
+            getgenv().espEnabled = arg_283
+
+            applyESP()
+        end,
+    }):AddColorPicker('ESPColor', {
+        Text = 'ESP Color',
+        Default = getgenv().espColor,
+        Callback = function(arg_284)
+            getgenv().espColor = arg_284
+
+            applyESP()
+        end,
+    })
+    ESP:AddToggle('name', {
+        Text = 'Names',
+        Default = false,
+        Callback = function(arg_285)
+            getgenv().nameESPEnabled = arg_285
+
+            applyESP()
+        end,
+    }):AddColorPicker('NameColor', {
+        Text = 'Name Color',
+        Default = getgenv().nameColor,
+        Callback = function(arg_286)
+            getgenv().nameColor = arg_286
+
+            applyESP()
+        end,
+    })
+    ESP:AddDropdown('NameDisplayMode', {
+        Text = 'Name Mode',
+        Values = {
+            'Username',
+            'DisplayName',
+            'Username (DisplayName)',
+        },
+        Default = 'Username',
+        Callback = function(arg_287)
+            getgenv().nameDisplayMode = arg_287
+
+            applyESP()
+        end,
+    })
+    ESP:AddToggle('HealthBarESP', {
+        Text = 'Health Bar',
+        Default = false,
+        Callback = function(arg_288)
+            getgenv().healthBarESP = arg_288
+
+            applyESP()
+        end,
+    }):AddColorPicker('HealthBarColor', {
+        Text = 'Health Bar Color',
+        Default = getgenv().healthBarColor,
+        Callback = function(arg_289)
+            getgenv().healthBarColor = arg_289
+
+            applyESP()
+        end,
+    })
+    ESP:AddToggle('StudsESPEnabled', {
+        Text = 'Distance',
+        Default = false,
+        Callback = function(arg_290)
+            getgenv().studsESPEnabled = arg_290
+
+            applyESP()
+        end,
+    }):AddColorPicker('DistanceColor', {
+        Text = 'Distance Color',
+        Default = getgenv().distanceColor,
+        Callback = function(arg_291)
+            getgenv().distanceColor = arg_291
+
+            applyESP()
+        end,
+    })
+    ESP:AddToggle('WeaponESPEnabled', {
+        Text = 'Weapon ESP',
+        Default = false,
+        Callback = function(arg_292)
+            getgenv().weaponESPEnabled = arg_292
+
+            applyESP()
+        end,
+    }):AddColorPicker('WeaponColor', {
+        Text = 'Weapon Color',
+        Default = getgenv().weaponColor,
+        Callback = function(arg_293)
+            getgenv().weaponColor = arg_293
+
+            applyESP()
+        end,
+    })
+    ESP:AddToggle('ArmorBarESP', {
+        Text = 'Armor Bar',
+        Default = false,
+        Callback = function(arg_294)
+            getgenv().armorBarESP = arg_294
+
+            applyESP()
+        end,
+    }):AddColorPicker('ArmorBarColor', {
+        Text = 'Armor Bar Color',
+        Default = getgenv().armorBarColor,
+        Callback = function(arg_295)
+            getgenv().armorBarColor = arg_295
+
+            applyESP()
+        end,
+    })
+    ESP:AddToggle('OutlineEnabled', {
+        Text = 'Outline',
+        Default = false,
+        Callback = function(arg_296)
+            getgenv().outlineEnabled = arg_296
+
+            applyESP()
+        end,
+    })
+    ESP:AddToggle('PenisESPEnabled', {
+        Text = 'Penis ESP',
+        Default = false,
+        Callback = function(arg_297)
+            getgenv().penisESPEnabled = arg_297
+
+            applyESP()
+        end,
+    })
+
+    local var_298 = getgenv()
+    local var_299 = getgenv()
+
+    getgenv().cframeSpeedEnabled = false
+    var_299.jumpPowerEnabled = false
+    var_298.walkSpeedEnabled = false
+
+    local var_300 = getgenv()
+
+    getgenv().cframeSpeedKeybindActive = false
+    var_300.walkSpeedKeybindActive = false
+
+    local var_301 = getgenv()
+    local var_302 = getgenv()
+
+    getgenv().cframeSpeed = 10
+    var_302.jumpPower = 50
+    var_301.walkSpeed = 16
+
+    local Movement = Tabs.Character:AddLeftGroupbox('Movement')
+
+    Movement:AddToggle('CFrameSpeedToggle', {
+        Text = 'cframe',
+        Default = false,
+        Callback = function(arg_304)
+            getgenv().cframeSpeedEnabled = arg_304
+
+            if not arg_304 then
+                getgenv().cframeSpeedKeybindActive = false
+            end
+        end,
+    }):AddKeyPicker('CFrameSpeedKeybind', {
+        Default = 'T',
+        Text = 'Cframe',
+        Mode = 'Toggle',
+        Callback = function(arg_305)
+            if not game:GetService('UserInputService'):GetFocusedTextBox() then
+                if getgenv().cframeSpeedEnabled then
+                    getgenv().cframeSpeedKeybindActive = arg_305
+                end
+            end
+        end,
+    })
+    Movement:AddToggle('WalkSpeedToggle', {
+        Text = 'WalkSpeed',
+        Default = false,
+        Callback = function(arg_306)
+            getgenv().walkSpeedEnabled = arg_306
+
+            if not arg_306 then
+                getgenv().walkSpeedKeybindActive = false
+            end
+        end,
+    }):AddKeyPicker('WalkSpeedKeybind', {
+        Default = 'T',
+        Text = 'Velocity',
+        Mode = 'Toggle',
+        Callback = function(arg_307)
+            if not game:GetService('UserInputService'):GetFocusedTextBox() then
+                if getgenv().walkSpeedEnabled then
+                    getgenv().walkSpeedKeybindActive = arg_307
+                end
+            end
+        end,
+    })
+    Movement:AddToggle('JumpPowerToggle', {
+        Text = 'JumpPower',
+        Default = false,
+        Callback = function(arg_308)
+            getgenv().jumpPowerEnabled = arg_308
+        end,
+    })
+    Movement:AddSlider('WalkSpeedSlider', {
+        Text = 'WalkSpeed',
+        Default = 16,
+        Min = 16,
+        Max = 500,
+        Rounding = 0,
+        Callback = function(arg_309)
+            getgenv().walkSpeed = arg_309
+        end,
+    })
+    Movement:AddSlider('JumpPowerSlider', {
+        Text = 'JumpPower',
+        Default = 50,
+        Min = 50,
+        Max = 500,
+        Rounding = 0,
+        Callback = function(arg_310)
+            getgenv().jumpPower = arg_310
+        end,
+    })
+    Movement:AddSlider('CFrameSpeedSlider', {
+        Text = 'Speed',
+        Default = 10,
+        Min = 1,
+        Max = 200,
+        Rounding = 1,
+        Callback = function(arg_311)
+            getgenv().cframeSpeed = arg_311
+        end,
+    })
+    game:GetService('RunService').RenderStepped:Connect(function()
+        local LocalPlayer2 = game.Players.LocalPlayer
+        local Character3 = LocalPlayer2.Character
+
+        if Character3 then
+            Character3 = LocalPlayer2.Character:FindFirstChild('Humanoid')
+        end
+        if Character3 then
+            Character3.WalkSpeed = getgenv().walkSpeedEnabled and (getgenv().walkSpeedKeybindActive and getgenv().walkSpeed) or 16
+            Character3.JumpPower = getgenv().jumpPowerEnabled and getgenv().jumpPower or 50
+        end
+    end)
+    task.spawn(function()
+        while task.wait(0) do
+            local Character4 = game.Players.LocalPlayer.Character
+            local var_315
+
+            if Character4 then
+                var_315 = Character4:FindFirstChild('Humanoid')
+            else
+                var_315 = Character4
+            end
+            if getgenv().cframeSpeedEnabled and (getgenv().cframeSpeedKeybindActive and (Character4 and (var_315 and var_315.MoveDirection.Magnitude > 0))) then
+                Character4:TranslateBy(var_315.MoveDirection * getgenv().cframeSpeed * task.wait() * 3)
+            end
+        end
+    end)
+
+    getgenv().FlightKeybind = Enum.KeyCode.X
+    getgenv().FlySpeed = 50
+    getgenv().FlightEnabled = false
+    getgenv().Flying = false
+
+    local function CreateFlightCore()
+        if workspace:FindFirstChild('Core') then
+            workspace.Core:Destroy()
+        end
+
+        local Part = Instance.new('Part')
+
+        Part.Name = 'Core'
+        Part.Size = Vector3.new(0.05, 0.05, 0.05)
+        Part.CanCollide = false
+        Part.Transparency = 1
+        Part.Parent = workspace
+
+        local Weld = Instance.new('Weld', Part)
+
+        Weld.Part0 = Part
+        Weld.Part1 = LocalPlayer.Character.HumanoidRootPart
+        Weld.C0 = CFrame.new(0, 0, 0)
+
+        return Part
+    end
+    local function EnableFlight()
+        if not getgenv().Flying then
+            getgenv().Flying = true
+            LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+
+            local var_319 = CreateFlightCore()
+            local BodyVelocity = Instance.new('BodyVelocity', var_319)
+
+            BodyVelocity.MaxForce = Vector3.new(9000000000, 9000000000, 9000000000)
+            BodyVelocity.Velocity = Vector3.zero
+
+            local BodyGyro = Instance.new('BodyGyro', var_319)
+
+            BodyGyro.MaxTorque = Vector3.new(9000000000, 9000000000, 9000000000)
+            BodyGyro.P = 90000
+            BodyGyro.CFrame = var_319.CFrame
+
+            RunService.RenderStepped:Connect(function()
+                if getgenv().Flying then
+                    local CurrentCamera3 = workspace.CurrentCamera
+                    local zero = Vector3.zero
+
+                    if UserInputService:IsKeyDown(Enum.KeyCode.W) then
+                        zero = zero + CurrentCamera3.CFrame.LookVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.S) then
+                        zero = zero - CurrentCamera3.CFrame.LookVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.A) then
+                        zero = zero - CurrentCamera3.CFrame.RightVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.D) then
+                        zero = zero + CurrentCamera3.CFrame.RightVector
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.Space) then
+                        zero = zero + Vector3.new(0, 1, 0)
+                    end
+                    if UserInputService:IsKeyDown(Enum.KeyCode.LeftControl) then
+                        zero = zero - Vector3.new(0, 1, 0)
+                    end
+
+                    BodyVelocity.Velocity = zero * getgenv().FlySpeed
+                    BodyGyro.CFrame = CurrentCamera3.CFrame
+                end
+            end)
+        end
+    end
+    local function DisableFlight()
+        if getgenv().Flying then
+            getgenv().Flying = false
+            LocalPlayer.Character:FindFirstChildOfClass('Humanoid').PlatformStand = false
+
+            if workspace:FindFirstChild('Core') then
+                workspace.Core:Destroy()
+            end
+        end
+    end
+
+    Movement:AddToggle('FlightToggle', {
+        Text = 'Flight',
+        Default = false,
+        Callback = function(arg_326)
+            getgenv().FlightEnabled = arg_326
+
+            if not arg_326 then
+                DisableFlight()
+            end
+        end,
+    }):AddKeyPicker('FlightKeybindPicker', {
+        Default = 'X',
+        Text = 'Flight',
+        Mode = 'Toggle',
+        Callback = function(arg_327)
+            if not UserInputService:GetFocusedTextBox() then
+                if arg_327 and getgenv().FlightEnabled then
+                    EnableFlight()
+                else
+                    DisableFlight()
+                end
+            end
+        end,
+    })
+    Movement:AddSlider('FlySpeedSlider', {
+        Text = 'Fly Speed',
+        Default = 50,
+        Min = 10,
+        Max = 5000,
+        Rounding = 0,
+        Callback = function(arg_328)
+            getgenv().FlySpeed = arg_328
+        end,
+    })
+
+    getgenv().StompToggle = false
+    getgenv().StompInterval = 0.1
+    getgenv().StompKeybind = Enum.KeyCode.F
+
+    task.spawn(function()
+        while true do
+            repeat
+                task.wait(getgenv().StompInterval)
+            until getgenv().StompToggle
+
+            MainEvent:FireServer('Stomp')
+        end
+    end)
+
+    local Stomp = Tabs.Misc:AddLeftGroupbox('Stomp')
+
+    Stomp:AddToggle('StompToggle', {
+        Text = 'Enable Stomp',
+        Default = false,
+        Callback = function(arg_330)
+            getgenv().StompToggle = arg_330
+        end,
+    })
+    Stomp:AddSlider('StompIntervalSlider', {
+        Text = 'Stomp Interval (seconds)',
+        Default = 0.1,
+        Min = 0.01,
+        Max = 1,
+        Rounding = 2,
+        Compact = false,
+        Callback = function(arg_331)
+            getgenv().StompInterval = arg_331
+        end,
+    })
+    Stomp:AddLabel('Stomp Keybind'):AddKeyPicker('StompKeyPicker', {
+        Default = 'F',
+        SyncToggleState = false,
+        Mode = 'Toggle',
+        Text = 'Stomp Toggle Key',
+        NoUI = false,
+        Callback = function(arg_332)
+            getgenv().StompToggle = arg_332
+
+            if Toggles.StompToggle then
+                Toggles.StompToggle:SetValue(arg_332)
+            else
+                warn('Toggles.StompToggle not found!')
+            end
+        end,
+        ChangedCallback = function(arg_333)
+            if arg_333:sub(1, 2) ~= 'MB' then
+                if Enum.KeyCode[arg_333] then
+                    getgenv().StompKeybind = Enum.KeyCode[arg_333]
+                else
+                    warn('Invalid key: ' .. arg_333)
+                end
+            else
+                local var_334 = 'MouseButton' .. arg_333:sub(3)
+
+                if Enum.UserInputType[var_334] then
+                    getgenv().StompKeybind = Enum.UserInputType[var_334]
+                else
+                    warn('Invalid mouse button: ' .. arg_333)
+                end
+            end
+        end,
+    })
+    game:GetService('UserInputService').InputBegan:Connect(function(arg_335, arg_336)
+        if not arg_336 then
+            if getgenv().StompToggle and (arg_335.UserInputType == getgenv().StompKeybind or arg_335.KeyCode == getgenv().StompKeybind) then
+                print('Stomp activated!')
+            end
+        end
+    end)
+    Tabs.Character:AddLeftGroupbox('avatar')
+
+    local EmoteList = {
+        None = '',
+        Floss = 'rbxassetid://10714340543',
+        Disco = 'rbxassetid://3333136415',
+        Happy = 'rbxassetid://4841405708',
+        ['Hero Landing'] = 'rbxassetid://5104344710',
+        ['Old Town Road'] = 'rbxassetid://5937560570',
+        ['River Dance'] = 'rbxassetid://3333432454',
+        Shuffle = 'rbxassetid://4349242221',
+        Cutesy = 'rbxassetid://4265725525',
+        ['Yungblud Happier Jump'] = 'rbxassetid://15609995579',
+        Fashion = 'rbxassetid://3333331310',
+        ['Baby Dance'] = 'rbxassetid://4265725525',
+        ['Cha-Cha'] = 'rbxassetid://6862001787',
+        Monkey = 'rbxassetid://3333499508',
+        ['Top Rock'] = 'rbxassetid://3361276673',
+        ['Around Town'] = 'rbxassetid://3303391864',
+        ['Fancy Feet'] = 'rbxassetid://3333432454',
+        ['Hype Dance'] = 'rbxassetid://3695333486',
+        Bodybuilder = 'rbxassetid://3333387824',
+        Idol = 'rbxassetid://4101966434',
+        Curtsy = 'rbxassetid://4555816777',
+        ['Quiet Waves'] = 'rbxassetid://7465981288',
+        Sleep = 'rbxassetid://4686925579',
+        ['Floss Dance'] = 'rbxassetid://5917459365',
+        Shy = 'rbxassetid://3337978742',
+        Godlike = 'rbxassetid://3337994105',
+        ['High Wave'] = 'rbxassetid://5915690960',
+        Cower = 'rbxassetid://4940563117',
+        Bored = 'rbxassetid://5230599789',
+        ['Show Dem Wrists - KSI'] = 'rbxassetid://7198989668',
+        Celebrate = 'rbxassetid://3338097973',
+        Dash = 'rbxassetid://582855105',
+        Beckon = 'rbxassetid://5230598276',
+        Haha = 'rbxassetid://3337966527',
+        ['Lasso Turn - Tai Verdes'] = 'rbxassetid://7942896991',
+        ['Line Dance'] = 'rbxassetid://4049037604',
+        Shrug = 'rbxassetid://3334392772',
+        Point2 = 'rbxassetid://3344585679',
+        Stadium = 'rbxassetid://3338055167',
+        Confused = 'rbxassetid://4940561610',
+        ['Side to Side'] = 'rbxassetid://3333136415',
+        Hello = 'rbxassetid://3344650532',
+        ['Dolphin Dance'] = 'rbxassetid://5918726674',
+        Samba = 'rbxassetid://6869766175',
+        ['Break Dance'] = 'rbxassetid://5915648917',
+        ["Hips Poppin' - Zara Larsson"] = 'rbxassetid://6797888062',
+        ['Wake Up Call - KSI'] = 'rbxassetid://7199000883',
+        Greatest = 'rbxassetid://3338042785',
+        ['On The Outside - Twenty One'] = 'rbxassetid://7422779536',
+        ['Boxing Punch - KSI'] = 'rbxassetid://7202863182',
+        Sad = 'rbxassetid://4841407203',
+        ['Flowing Breeze'] = 'rbxassetid://7465946930',
+        Twirl = 'rbxassetid://3334968680',
+        ['Jumping Wave'] = 'rbxassetid://4940564896',
+        ['HOLIDAY Dance - Lil Nas X'] = 'rbxassetid://5937558680',
+        ['Take Me Under - Zara Larsson'] = 'rbxassetid://6797890377',
+        Dizzy = 'rbxassetid://3361426436',
+        ["Dancing' Shoes - Twenty One"] = 'rbxassetid://7404878500',
+        Fashionable = 'rbxassetid://3333331310',
+        ['Fast Hands'] = 'rbxassetid://4265701731',
+        Tree = 'rbxassetid://4049551434',
+        Agree = 'rbxassetid://4841397952',
+        ['Power Blast'] = 'rbxassetid://4841403964',
+        Swoosh = 'rbxassetid://3361481910',
+        ['Jumping Cheer'] = 'rbxassetid://5895324424',
+        Disagree = 'rbxassetid://4841401869',
+        ['Rodeo Dance - Lil Nas X'] = 'rbxassetid://5918728267',
+        ["It Ain't My Fault - Zara Larsson"] = 'rbxassetid://6797891807',
+        ['Rock On'] = 'rbxassetid://5915714366',
+        ['Block Partier'] = 'rbxassetid://6862022283',
+        ['Dorky Dance'] = 'rbxassetid://4212455378',
+        Zombie = 'rbxassetid://4210116953',
+        ['AOK - Tai Verdes'] = 'rbxassetid://7942885103',
+        T = 'rbxassetid://3338010159',
+        ['Cobra Arms - Tai Verdes'] = 'rbxassetid://7942890105',
+        ['Panini Dance - Lil Nas X'] = 'rbxassetid://5915713518',
+        Fishing = 'rbxassetid://3334832150',
+        Robot = 'rbxassetid://3338025566',
+        ['Saturday Dance - Twenty One'] = 'rbxassetid://7422807549',
+        ['Keeping Time'] = 'rbxassetid://4555808220',
+        ['Air Dance'] = 'rbxassetid://4555782893',
+        ['Rock Guitar - Royal Blood'] = 'rbxassetid://6532134724',
+        ["Borock's Rage"] = 'rbxassetid://3236842542',
+        ["Ud'zal's Summoning"] = 'rbxassetid://3303161675',
+        Y = 'rbxassetid://4349285876',
+        ['Swan Dance'] = 'rbxassetid://7465997989',
+        Louder = 'rbxassetid://3338083565',
+        ['Up and Down - Twenty One'] = 'rbxassetid://7422797678',
+        Swish = 'rbxassetid://3361481910',
+        ['Drummer Moves - Twenty One'] = 'rbxassetid://7422527690',
+        Sneaky = 'rbxassetid://3334424322',
+        ['Heisman Pose'] = 'rbxassetid://3695263073',
+        Jacks = 'rbxassetid://3338066331',
+        ['Cha-Cha 2'] = 'rbxassetid://3695322025',
+        ['BURBERRY LOLA ATTITUDE - NIMBUS'] = 'rbxassetid://10147821284',
+        ['BURBERRY LOLA ATTITUDE - GEM'] = 'rbxassetid://10147815602',
+        ['BURBERRY LOLA ATTITUDE - HYDRO'] = 'rbxassetid://10147823318',
+        ['BURBERRY LOLA ATTITUDE - BLOOM'] = 'rbxassetid://10147817997',
+        ['Superhero Reveal'] = 'rbxassetid://3695373233',
+        ['Air Guitar'] = 'rbxassetid://3695300085',
+        ['Dismissive Wave'] = 'rbxassetid://3333272779',
+        ['Country Line Dance - Lil Nas X'] = 'rbxassetid://5915712534',
+        Salute = 'rbxassetid://3333474484',
+        Applaud = 'rbxassetid://5915693819',
+        ['Get Out'] = 'rbxassetid://3333272779',
+        ['Hwaiting (\u{d654}\u{c774}\u{d305})'] = 'rbxassetid://9527885267',
+        ['Annyeong (\u{c548}\u{b155})'] = 'rbxassetid://9527883498',
+        ['Bunny Hop'] = 'rbxassetid://4641985101',
+        ['Sandwich Dance'] = 'rbxassetid://4406555273',
+        ['Hyperfast 5G Dance Move'] = 'rbxassetid://9408617181',
+        ['Victory - 24kGoldn'] = 'rbxassetid://9178377686',
+        Tantrum = 'rbxassetid://5104341999',
+        ['Rock Star - Royal Blood'] = 'rbxassetid://10714400171',
+        ['Drum Solo - Royal Blood'] = 'rbxassetid://6532839007',
+        ['Drum Master - Royal Blood'] = 'rbxassetid://6531483720',
+        ['High Hands'] = 'rbxassetid://9710985298',
+        Tilt = 'rbxassetid://3334538554',
+        ['Gashina - SUNMI'] = 'rbxassetid://9527886709',
+        ['Chicken Dance'] = 'rbxassetid://4841399916',
+        ["You can't sit with us - Sunmi"] = 'rbxassetid://9983520970',
+        ['Frosty Flair - Tommy Hilfiger'] = 'rbxassetid://10214311282',
+        ['Floor Rock Freeze - Tommy Hilfiger'] = 'rbxassetid://10214314957',
+        ['Boom Boom Clap - George Ezra'] = 'rbxassetid://10370346995',
+    }
+    local var_338, var_339, var_340 = pairs(EmoteList)
+    local var_341 = {}
+    local DanceEnabled = false
+
+    while true do
+        var_340 = var_338(var_339, var_340)
+
+        if var_340 == nil then
+            break
+        end
+
+        table.insert(var_341, var_340)
+    end
+
+    local CurrentDanceName = var_341[1]
+    local CurrentDanceId = EmoteList[CurrentDanceName]
+    local DanceTrack = nil
+    local LaggyEmoteEnabled = false
+    local LaggyEmoteCoroutine = nil
+    local LagIntensity = 1
+
+    local function IsCharacterAlive(arg_349)
+        local var_350 = arg_349 and (arg_349:FindFirstChild('Humanoid') and arg_349:FindFirstChild('HumanoidRootPart'))
+
+        if var_350 then
+            var_350 = arg_349:FindFirstChildOfClass('Humanoid').Health > 0
+        end
+
+        return var_350
+    end
+    local function LoadDanceAnimation()
+        local Character5 = game.Players.LocalPlayer.Character
+
+        if IsCharacterAlive(Character5) then
+            local Humanoid2 = Character5:FindFirstChild('Humanoid')
+            local var_354 = Humanoid2:FindFirstChildOfClass('Animator') or Instance.new('Animator', Humanoid2)
+
+            if DanceTrack then
+                DanceTrack:Stop()
+                DanceTrack:Destroy()
+
+                DanceTrack = nil
+            end
+            if CurrentDanceId ~= '' then
+                local Animation = Instance.new('Animation')
+
+                Animation.AnimationId = CurrentDanceId
+                DanceTrack = var_354:LoadAnimation(Animation)
+                DanceTrack.Priority = Enum.AnimationPriority.Action
+            end
+        else
+            warn('Character or required components not found for dance animation')
+
+            return
+        end
+    end
+    local function PlayDanceAnimation()
+        if DanceEnabled and DanceTrack then
+            if not DanceTrack.IsPlaying then
+                local var_357, var_358 = pcall(function()
+                    DanceTrack:Play()
+                end)
+
+                if not var_357 then
+                    warn('Failed to play dance animation: ' .. tostring(var_358))
+                end
+            end
+        else
+            return
+        end
+    end
+
+    game.Players.LocalPlayer.CharacterAdded:Connect(function(arg_360)
+        if DanceEnabled then
+            if arg_360:WaitForChild('Humanoid', 5) then
+                LoadDanceAnimation()
+                PlayDanceAnimation()
+            else
+                warn('Humanoid not found for dance animation')
+            end
+        else
+            return
+        end
+    end)
+
+    if game.Players.LocalPlayer.Character and IsCharacterAlive(game.Players.LocalPlayer.Character) then
+        LoadDanceAnimation()
+        PlayDanceAnimation()
+    end
+
+    local Avatar = Tabs.Character:AddLeftGroupbox('Avatar')
+
+    Avatar:AddToggle('EnableDance', {
+        Text = 'Enable Dance',
+        Default = false,
+        Tooltip = 'Toggles the selected dance animation',
+        Callback = function(arg_362)
+            DanceEnabled = arg_362
+
+            if arg_362 then
+                LoadDanceAnimation()
+                PlayDanceAnimation()
+            else
+                if DanceTrack then
+                    DanceTrack:Stop()
+                end
+                if LaggyEmoteCoroutine then
+                    coroutine.close(LaggyEmoteCoroutine)
+
+                    LaggyEmoteCoroutine = nil
+                end
+            end
+        end,
+    })
+    Avatar:AddDropdown('SelectDance', {
+        Text = 'Select Dance Animation',
+        Default = var_341[1],
+        Values = var_341,
+        Tooltip = 'Choose a dance animation to play',
+        Callback = function(arg_363)
+            CurrentDanceName = arg_363
+            CurrentDanceId = EmoteList[arg_363]
+
+            if DanceEnabled then
+                LoadDanceAnimation()
+                PlayDanceAnimation()
+            end
+        end,
+    })
+    Avatar:AddToggle('LaggyEmoteToggle', {
+        Text = 'Laggy Emote',
+        Default = false,
+        Tooltip = 'Makes the emote animation stutter/lag',
+        Callback = function(arg_364)
+            LaggyEmoteEnabled = arg_364
+
+            if LaggyEmoteEnabled and DanceTrack then
+                if LaggyEmoteCoroutine then
+                    coroutine.close(LaggyEmoteCoroutine)
+                end
+
+                LaggyEmoteCoroutine = coroutine.create(function()
+                    while LaggyEmoteEnabled and (DanceTrack and DanceTrack.IsPlaying) do
+                        local var_365 = 0.3 + LagIntensity * 0.3
+                        local var_366 = 0.05 + LagIntensity * 0.15
+
+                        if math.random() < var_365 then
+                            DanceTrack.TimePosition = math.max(0, DanceTrack.TimePosition - var_366)
+                        end
+
+                        task.wait(0.1 / math.max(0.5, LagIntensity))
+                    end
+                end)
+
+                coroutine.resume(LaggyEmoteCoroutine)
+            else
+                if LaggyEmoteCoroutine then
+                    coroutine.close(LaggyEmoteCoroutine)
+
+                    LaggyEmoteCoroutine = nil
+                end
+                if DanceTrack and (not DanceTrack.IsPlaying and DanceEnabled) then
+                    DanceTrack:Play()
+                end
+            end
+        end,
+    })
+    Avatar:AddSlider('LagIntensitySlider', {
+        Text = 'Lag Intensity',
+        Default = 1,
+        Min = 0,
+        Max = 2,
+        Rounding = 1,
+        Tooltip = 'Adjusts the intensity of the laggy emote effect',
+        Callback = function(arg_367)
+            LagIntensity = arg_367
+        end,
+    })
+
+    DesyncBox = Tabs.Character:AddRightGroupbox('Desyncs')
+
+    local UserInputService2 = game:GetService('UserInputService')
+    local RunService2 = game:GetService('RunService')
+    local LocalPlayer3 = game:GetService('Players').LocalPlayer
+
+    desync_setback = Instance.new('Part')
+    desync_setback.Name = 'Desync Setback'
+    desync_setback.Parent = workspace
+    desync_setback.Size = Vector3.new(2, 2, 1)
+    desync_setback.CanCollide = false
+    desync_setback.Anchored = true
+    desync_setback.Transparency = 1
+    desync = {
+        enabled = false,
+        mode = 'Void',
+        teleportPosition = Vector3.new(0, 0, 0),
+        old_position = nil,
+        voidSpamActive = false,
+        toggleEnabled = false,
+    }
+
+    function resetCamera()
+        local var_371 = LocalPlayer3.Character and LocalPlayer3.Character:FindFirstChild('Humanoid')
+
+        if var_371 then
+            workspace.CurrentCamera.CameraSubject = var_371
+        end
+    end
+    function toggleDesync(arg_372)
+        desync.enabled = arg_372
+
+        if desync.enabled then
+            workspace.CurrentCamera.CameraSubject = desync_setback
+
+            Library:Notify("Desync Enabled '" .. desync.mode .. "' ghosted.lol$", 2)
+        else
+            resetCamera()
+            Library:Notify("Desync Disabled '" .. desync.mode .. "' ghosted.lol", 2)
+        end
+    end
+    function setDesyncMode(arg_373)
+        desync.mode = arg_373
+    end
+
+    DesyncBox:AddToggle('DesyncToggle', {
+        Text = 'Anti Aim',
+        Default = false,
+        Callback = function(arg_374)
+            desync.toggleEnabled = arg_374
+
+            if not arg_374 then
+                toggleDesync(false)
+            end
+        end,
+    }):AddKeyPicker('DesyncKeybind', {
+        Default = 'V',
+        Text = 'Desync',
+        Mode = 'Toggle',
+        Callback = function(_)
+            if desync.toggleEnabled and not UserInputService2:GetFocusedTextBox() then
+                toggleDesync(not desync.enabled)
+            end
+        end,
+    })
+
+    local Desync = Tabs.Character:AddLeftGroupbox('Desync')
+
+    DesyncBox:AddDropdown('DesyncMethodDropdown', {
+        Values = {
+            'Destroy Cheaters',
+            'Underground',
+            'Void Spam',
+            'Void',
+        },
+        Default = 'Void',
+        Multi = false,
+        Text = 'Method',
+        Callback = function(arg_376)
+            setDesyncMode(arg_376)
+        end,
+    })
+    RunService2.Heartbeat:Connect(function()
+        local var_377 = desync.enabled and LocalPlayer3.Character and LocalPlayer3.Character:FindFirstChild('HumanoidRootPart')
+
+        if var_377 then
+            desync.old_position = var_377.CFrame
+
+            if desync.mode ~= 'Destroy Cheaters' then
+                if desync.mode ~= 'Underground' then
+                    if desync.mode ~= 'Void Spam' then
+                        if desync.mode == 'Void' then
+                            desync.teleportPosition = Vector3.new(var_377.Position.X + math.random(-444444, 444444), var_377.Position.Y + math.random(-444444, 444444), var_377.Position.Z + math.random(-44444, 44444))
+                        end
+                    else
+                        desync.teleportPosition = math.random(1, 2) == 1 and desync.old_position.Position or Vector3.new(math.random(333, 333), math.random(333, 333), math.random(333, 333))
+                    end
+                else
+                    desync.teleportPosition = var_377.Position - Vector3.new(0, 8, 0)
+                end
+            else
+                desync.teleportPosition = Vector3.new(1.122334455667789e19, 1, 1)
+            end
+            if desync.mode ~= 'Rotation' then
+                var_377.CFrame = CFrame.new(desync.teleportPosition)
+                workspace.CurrentCamera.CameraSubject = desync_setback
+
+                RunService2.RenderStepped:Wait()
+
+                desync_setback.CFrame = desync.old_position * CFrame.new(0, var_377.Size.Y / 2 + 0.5, 0)
+                var_377.CFrame = desync.old_position
+            end
+        end
+    end)
+
+    local DesyncState = false
+    local DesyncEnabled = false
+    local DesyncActive = false
+
+    local function GetRootPart()
+        return (LocalPlayer3.Character or LocalPlayer3.CharacterAdded:Wait()):WaitForChild('HumanoidRootPart', 5)
+    end
+    local function SyncPhysics(arg_382)
+        if arg_382 then
+            setfflag('S2PhysicsSenderRate', '1')
+            setfpscap(1)
+            task.wait(0.01)
+            setfflag('S2PhysicsSenderRate', '200')
+            setfpscap(240)
+        end
+    end
+
+    Desync:AddToggle('DesyncToggle', {
+        Text = 'Fake Position',
+        Default = false,
+        Tooltip = 'Toggle Fake Position desync',
+        Callback = function(arg_384)
+            DesyncEnabled = arg_384
+            DesyncActive = arg_384
+
+            if arg_384 then
+                SyncPhysics(true)
+
+                if not G.DesyncConn then
+                    G.DesyncConn = RunService2.Heartbeat:Connect(function()
+                        local up_385 = DesyncEnabled and GetRootPart()
+
+                        if up_385 then
+                            DesyncState = not DesyncState
+
+                            pcall(function()
+                                sethiddenproperty(up_385, 'NetworkIsSleeping', DesyncState)
+                            end)
+                        end
+                    end)
+                end
+            else
+                DesyncEnabled = false
+                DesyncActive = false
+
+                if G.DesyncConn then
+                    G.DesyncConn:Disconnect()
+
+                    G.DesyncConn = nil
+                end
+
+                local up_386 = GetRootPart()
+
+                if up_386 then
+                    pcall(function()
+                        sethiddenproperty(up_386, 'NetworkIsSleeping', false)
+                    end)
+                end
+            end
+        end,
+    })
+
+    local Animation2 = Tabs.Misc:AddLeftGroupbox('Animation')
+    local KeepAnimationOnDeath = false
+    local CurrentAnimations = {
+        Idle1 = 'http://www.roblox.com/asset/?id=180435571',
+        Idle2 = 'http://www.roblox.com/asset/?id=180435792',
+        Walk = 'http://www.roblox.com/asset/?id=180426354',
+        Run = 'http://www.roblox.com/asset/?id=180426354',
+        Jump = 'http://www.roblox.com/asset/?id=125750702',
+        Climb = 'http://www.roblox.com/asset/?id=180436334',
+        Fall = 'http://www.roblox.com/asset/?id=180436148',
+    }
+    local AnimationPacks = {
+        Default = {
+            idle1 = 'http://www.roblox.com/asset/?id=180435571',
+            idle2 = 'http://www.roblox.com/asset/?id=180435792',
+            walk = 'http://www.roblox.com/asset/?id=180426354',
+            run = 'http://www.roblox.com/asset/?id=180426354',
+            jump = 'http://www.roblox.com/asset/?id=125750702',
+            climb = 'http://www.roblox.com/asset/?id=180436334',
+            fall = 'http://www.roblox.com/asset/?id=180436148',
+        },
+        Ninja = {
+            idle1 = 'http://www.roblox.com/asset/?id=656117400',
+            idle2 = 'http://www.roblox.com/asset/?id=656118341',
+            walk = 'http://www.roblox.com/asset/?id=656121766',
+            run = 'http://www.roblox.com/asset/?id=656118852',
+            jump = 'http://www.roblox.com/asset/?id=656117878',
+            climb = 'http://www.roblox.com/asset/?id=656114359',
+            fall = 'http://www.roblox.com/asset/?id=656115606',
+        },
+        Superhero = {
+            idle1 = 'http://www.roblox.com/asset/?id=616111295',
+            idle2 = 'http://www.roblox.com/asset/?id=616113536',
+            walk = 'http://www.roblox.com/asset/?id=616122287',
+            run = 'http://www.roblox.com/asset/?id=616117076',
+            jump = 'http://www.roblox.com/asset/?id=616115533',
+            climb = 'http://www.roblox.com/asset/?id=616104706',
+            fall = 'http://www.roblox.com/asset/?id=616108001',
+        },
+        Robot = {
+            idle1 = 'http://www.roblox.com/asset/?id=616088211',
+            idle2 = 'http://www.roblox.com/asset/?id=616089559',
+            walk = 'http://www.roblox.com/asset/?id=616095330',
+            run = 'http://www.roblox.com/asset/?id=616091570',
+            jump = 'http://www.roblox.com/asset/?id=616090535',
+            climb = 'http://www.roblox.com/asset/?id=616086039',
+            fall = 'http://www.roblox.com/asset/?id=616087089',
+        },
+        Cartoon = {
+            idle1 = 'http://www.roblox.com/asset/?id=742637544',
+            idle2 = 'http://www.roblox.com/asset/?id=742638445',
+            walk = 'http://www.roblox.com/asset/?id=742640026',
+            run = 'http://www.roblox.com/asset/?id=742638842',
+            jump = 'http://www.roblox.com/asset/?id=742637942',
+            climb = 'http://www.roblox.com/asset/?id=742636889',
+            fall = 'http://www.roblox.com/asset/?id=742637151',
+        },
+        Catwalk = {
+            idle1 = 'http://www.roblox.com/asset/?id=133806214992291',
+            idle2 = 'http://www.roblox.com/asset/?id=94970088341563',
+            walk = 'http://www.roblox.com/asset/?id=109168724482748',
+            run = 'http://www.roblox.com/asset/?id=81024476153754',
+            jump = 'http://www.roblox.com/asset/?id=116936326516985',
+            climb = 'http://www.roblox.com/asset/?id=119377220967554',
+            fall = 'http://www.roblox.com/asset/?id=92294537340807',
+        },
+        Zombie = {
+            idle1 = 'http://www.roblox.com/asset/?id=616158929',
+            idle2 = 'http://www.roblox.com/asset/?id=616160636',
+            walk = 'http://www.roblox.com/asset/?id=616168032',
+            run = 'http://www.roblox.com/asset/?id=616163682',
+            jump = 'http://www.roblox.com/asset/?id=616161997',
+            climb = 'http://www.roblox.com/asset/?id=616156119',
+            fall = 'http://www.roblox.com/asset/?id=616157476',
+        },
+        Mage = {
+            idle1 = 'http://www.roblox.com/asset/?id=707742142',
+            idle2 = 'http://www.roblox.com/asset/?id=707855907',
+            walk = 'http://www.roblox.com/asset/?id=707897309',
+            run = 'http://www.roblox.com/asset/?id=707861613',
+            jump = 'http://www.roblox.com/asset/?id=707853694',
+            climb = 'http://www.roblox.com/asset/?id=707826056',
+            fall = 'http://www.roblox.com/asset/?id=707829716',
+        },
+        Pirate = {
+            idle1 = 'http://www.roblox.com/asset/?id=750785693',
+            idle2 = 'http://www.roblox.com/asset/?id=750782770',
+            walk = 'http://www.roblox.com/asset/?id=750785693',
+            run = 'http://www.roblox.com/asset/?id=750782770',
+            jump = 'http://www.roblox.com/asset/?id=750782770',
+            climb = 'http://www.roblox.com/asset/?id=750782770',
+            fall = 'http://www.roblox.com/asset/?id=750782770',
+        },
+        Knight = {
+            idle1 = 'http://www.roblox.com/asset/?id=657595757',
+            idle2 = 'http://www.roblox.com/asset/?id=657568135',
+            walk = 'http://www.roblox.com/asset/?id=657552124',
+            run = 'http://www.roblox.com/asset/?id=657564596',
+            jump = 'http://www.roblox.com/asset/?id=657560148',
+            climb = 'http://www.roblox.com/asset/?id=657556206',
+            fall = 'http://www.roblox.com/asset/?id=657552124',
+        },
+        Vampire = {
+            idle1 = 'http://www.roblox.com/asset/?id=1083465857',
+            idle2 = 'http://www.roblox.com/asset/?id=1083465857',
+            walk = 'http://www.roblox.com/asset/?id=1083465857',
+            run = 'http://www.roblox.com/asset/?id=1083465857',
+            jump = 'http://www.roblox.com/asset/?id=1083465857',
+            climb = 'http://www.roblox.com/asset/?id=1083465857',
+            fall = 'http://www.roblox.com/asset/?id=1083465857',
+        },
+        Bubbly = {
+            idle1 = 'http://www.roblox.com/asset/?id=910004836',
+            idle2 = 'http://www.roblox.com/asset/?id=910009958',
+            walk = 'http://www.roblox.com/asset/?id=910034870',
+            run = 'http://www.roblox.com/asset/?id=910025107',
+            jump = 'http://www.roblox.com/asset/?id=910016857',
+            climb = 'http://www.roblox.com/asset/?id=910009958',
+            fall = 'http://www.roblox.com/asset/?id=910009958',
+        },
+        Elder = {
+            idle1 = 'http://www.roblox.com/asset/?id=845386501',
+            idle2 = 'http://www.roblox.com/asset/?id=845397899',
+            walk = 'http://www.roblox.com/asset/?id=845403856',
+            run = 'http://www.roblox.com/asset/?id=845386501',
+            jump = 'http://www.roblox.com/asset/?id=845386501',
+            climb = 'http://www.roblox.com/asset/?id=845386501',
+            fall = 'http://www.roblox.com/asset/?id=845386501',
+        },
+        Toy = {
+            idle1 = 'http://www.roblox.com/asset/?id=782841498',
+            idle2 = 'http://www.roblox.com/asset/?id=782841498',
+            walk = 'http://www.roblox.com/asset/?id=782841498',
+            run = 'http://www.roblox.com/asset/?id=782841498',
+            jump = 'http://www.roblox.com/asset/?id=782841498',
+            climb = 'http://www.roblox.com/asset/?id=782841498',
+            fall = 'http://www.roblox.com/asset/?id=782841498',
+        },
+    }
+
+    local function ApplyAnimations(arg_391)
+        if arg_391 then
+            local Animate = arg_391:FindFirstChild('Animate')
+
+            if Animate then
+                local var_393 = Animate:Clone()
+
+                var_393.idle.Animation1.AnimationId = CurrentAnimations.Idle1
+                var_393.idle.Animation2.AnimationId = CurrentAnimations.Idle2
+                var_393.walk.WalkAnim.AnimationId = CurrentAnimations.Walk
+                var_393.run.RunAnim.AnimationId = CurrentAnimations.Run
+                var_393.jump.JumpAnim.AnimationId = CurrentAnimations.Jump
+                var_393.climb.ClimbAnim.AnimationId = CurrentAnimations.Climb
+                var_393.fall.FallAnim.AnimationId = CurrentAnimations.Fall
+
+                Animate:Destroy()
+
+                var_393.Parent = arg_391
+            end
+        else
+            return
+        end
+    end
+
+    LocalPlayer3.CharacterAdded:Connect(function(arg_395)
+        if KeepAnimationOnDeath then
+            task.wait(1)
+            ApplyAnimations(arg_395)
+        end
+    end)
+
+    local var_396 = {
+        'Default',
+        'Ninja',
+        'Superhero',
+        'Robot',
+        'Cartoon',
+        'Catwalk',
+        'Zombie',
+        'Mage',
+        'Pirate',
+        'Knight',
+        'Vampire',
+        'Bubbly',
+        'Elder',
+        'Toy',
+    }
+
+    Animation2:AddDropdown('Idle1Dropdown', {
+        Values = var_396,
+        Default = 0,
+        Multi = false,
+        Text = 'Idle1',
+        Callback = function(arg_397)
+            CurrentAnimations.Idle1 = AnimationPacks[arg_397].idle1
+
+            ApplyAnimations(LocalPlayer3.Character)
+        end,
+    })
+    Animation2:AddDropdown('Idle2Dropdown', {
+        Values = var_396,
+        Default = 0,
+        Multi = false,
+        Text = 'Idle2',
+        Callback = function(arg_398)
+            CurrentAnimations.Idle2 = AnimationPacks[arg_398].idle2
+
+            ApplyAnimations(LocalPlayer3.Character)
+        end,
+    })
+    Animation2:AddDropdown('WalkDropdown', {
+        Values = var_396,
+        Default = 0,
+        Multi = false,
+        Text = 'Walk',
+        Callback = function(arg_399)
+            CurrentAnimations.Walk = AnimationPacks[arg_399].walk
+
+            ApplyAnimations(LocalPlayer3.Character)
+        end,
+    })
+    Animation2:AddDropdown('RunDropdown', {
+        Values = var_396,
+        Default = 0,
+        Multi = false,
+        Text = 'Run',
+        Callback = function(arg_400)
+            CurrentAnimations.Run = AnimationPacks[arg_400].run
+
+            ApplyAnimations(LocalPlayer3.Character)
+        end,
+    })
+    Animation2:AddDropdown('JumpDropdown', {
+        Values = var_396,
+        Default = 0,
+        Multi = false,
+        Text = 'Jump',
+        Callback = function(arg_401)
+            CurrentAnimations.Jump = AnimationPacks[arg_401].jump
+
+            ApplyAnimations(LocalPlayer3.Character)
+        end,
+    })
+    Animation2:AddDropdown('ClimbDropdown', {
+        Values = var_396,
+        Default = 0,
+        Multi = false,
+        Text = 'Climb',
+        Callback = function(arg_402)
+            CurrentAnimations.Climb = AnimationPacks[arg_402].climb
+
+            ApplyAnimations(LocalPlayer3.Character)
+        end,
+    })
+    Animation2:AddDropdown('FallDropdown', {
+        Values = var_396,
+        Default = 0,
+        Multi = false,
+        Text = 'Fall',
+        Callback = function(arg_403)
+            CurrentAnimations.Fall = AnimationPacks[arg_403].fall
+
+            ApplyAnimations(LocalPlayer3.Character)
+        end,
+    })
+    Animation2:AddToggle('MyToggle', {
+        Text = 'Keep On Death',
+        Default = false,
+        Tooltip = 'Keeps the animation after respawning',
+        Callback = function(arg_404)
+            KeepAnimationOnDeath = arg_404
+        end,
+    })
+    Animation2:AddToggle('ReallySkinnyNaN', {
+        Text = 'Get Really Skinny (FE)',
+        Default = false,
+        Tooltip = 'This is for trolling',
+        Callback = function(arg_405)
+            if arg_405 then
+                game.ReplicatedStorage.MainEvent:FireServer('ChangeMuscleInformation', 'NaN')
+            end
+        end,
+    })
+    Animation2:AddToggle('ReallySkinnyNormal', {
+        Text = 'normal weight',
+        Default = false,
+        Tooltip = '',
+        Callback = function(arg_406)
+            if arg_406 then
+                game.ReplicatedStorage.MainEvent:FireServer('ChangeMuscleInformation', '100')
+            end
+        end,
+    })
+    Animation2:AddToggle('Chatspy', {
+        Text = 'Chatspy',
+        Default = false,
+        Tooltip = 'see the chat',
+        Callback = function(arg_407)
+            game:GetService('TextChatService').ChatWindowConfiguration.Enabled = arg_407
+        end,
+    })
+
+    local Avatar2 = Tabs.Misc:AddRightGroupbox('Avatar')
+
+    LocalPlayer3.CharacterAdded:Connect(function(arg_409)
+        task.wait(1)
+        updateShootSound(arg_409)
+    end)
+
+    local var_410 = LocalPlayer3
+
+    LocalPlayer3.WaitForChild(var_410, 'Backpack').ChildAdded:Connect(function(arg_411)
+        task.wait(0.5)
+        updateShootSound(arg_411)
+    end)
+
+    local MorphUserList = {
+        {
+            UserId = 22782710,
+            UserName = 'cat',
+        },
+        {
+            UserId = 140383551,
+            UserName = 'ender',
+        },
+        {
+            UserId = 3759059,
+            UserName = 'noobslayer2010',
+        },
+    }
+    local MorphEnabled = true
+    local MorphHeadEnabled = true
+    local MorphLegsEnabled = true
+
+    local function MorphToUser(arg_416, arg_417)
+        local var_418 = Players:GetCharacterAppearanceAsync(arg_416)
+        local var_419 = Players:FindFirstChild(arg_417)
+
+        if var_419 and var_419.Character then
+            local var_420, var_421, var_422 = pairs(var_419.Character:GetChildren())
+
+            while true do
+                local var_423
+
+                var_422, var_423 = var_420(var_421, var_422)
+
+                if var_422 == nil then
+                    break
+                end
+                if var_423:IsA('Accessory') or (var_423:IsA('Shirt') or (var_423:IsA('Pants') or (var_423:IsA('CharacterMesh') or var_423:IsA('BodyColors')))) then
+                    var_423:Destroy()
+                end
+            end
+
+            if var_419.Character.Head:FindFirstChild('face') then
+                var_419.Character.Head.face:Destroy()
+            end
+
+            local var_424, var_425, var_426 = pairs(var_418:GetChildren())
+
+            while true do
+                local var_427
+
+                var_426, var_427 = var_424(var_425, var_426)
+
+                if var_426 == nil then
+                    break
+                end
+                if var_427:IsA('Shirt') or (var_427:IsA('Pants') or var_427:IsA('BodyColors')) then
+                    var_427.Parent = var_419.Character
+                elseif var_427:IsA('Accessory') then
+                    var_419.Character.Humanoid:AddAccessory(var_427)
+                elseif var_427.Name == 'R15' and var_419.Character.Humanoid.RigType == Enum.HumanoidRigType.R15 then
+                    local CharacterMesh = var_427:FindFirstChildOfClass('CharacterMesh')
+
+                    if CharacterMesh then
+                        CharacterMesh.Parent = var_419.Character
+                    end
+                end
+            end
+
+            if var_418:FindFirstChild('face') then
+                var_418.face.Parent = var_419.Character.Head
+            else
+                local Decal = Instance.new('Decal')
+
+                Decal.Face = Enum.NormalId.Front
+                Decal.Name = 'face'
+                Decal.Texture = 'rbxasset://textures/face.png'
+                Decal.Transparency = 0
+                Decal.Parent = var_419.Character.Head
+            end
+
+            local Parent = var_419.Character.Parent
+
+            var_419.Character.Parent = nil
+            var_419.Character.Parent = Parent
+        end
+    end
+
+    Avatar2:AddDropdown('Char', {
+        Text = 'Select User to Morph Into',
+        Default = 'None',
+        Values = {
+            MorphUserList[1].UserName,
+            MorphUserList[2].UserName,
+            MorphUserList[3].UserName,
+        },
+        Callback = function(arg_432)
+            local var_433, var_434, var_435 = pairs(MorphUserList)
+
+            while true do
+                local var_436
+
+                var_435, var_436 = var_433(var_434, var_435)
+
+                if var_435 == nil then
+                    break
+                end
+                if var_436.UserName == arg_432 then
+                    if MorphEnabled then
+                        if MorphHeadEnabled and LocalPlayer3.Character and LocalPlayer3.Character:FindFirstChild('Head') then
+                            LocalPlayer3.Character.Head.MeshId = 6686307858
+                        end
+
+                        local var_437 = MorphLegsEnabled and LocalPlayer3.Character
+
+                        if var_437 then
+                            var_437.RightLowerLeg.MeshId = '902942093'
+                            var_437.RightLowerLeg.Transparency = 1
+                            var_437.RightUpperLeg.MeshId = 'http://www.roblox.com/asset/?id=902942096'
+                            var_437.RightUpperLeg.TextureID = 'http://roblox.com/asset/?id=902843398'
+                            var_437.RightFoot.MeshId = '902942089'
+                            var_437.RightFoot.Transparency = 1
+                        end
+
+                        MorphToUser(var_436.UserId, LocalPlayer3.Name)
+                    end
+
+                    break
+                end
+            end
+        end,
+    })
+
+    local SoundList = {
+        Bubble = 'rbxassetid://6534947588',
+        Lazer = 'rbxassetid://130791043',
+        Disco = 'rbxassetid://1347140027',
+        Pop = 'rbxassetid://198598793',
+        Rust = 'rbxassetid://1255040462',
+        Sans = 'rbxassetid://3188795283',
+        Fart = 'rbxassetid://130833677',
+        Big = 'rbxassetid://5332005053',
+        Vine = 'rbxassetid://5332680810',
+        UwU = 'rbxassetid://8679659744',
+        Bruh = 'rbxassetid://4578740568',
+        Skeet = 'rbxassetid://5633695679',
+        Neverlose = 'rbxassetid://6534948092',
+        Fatality = 'rbxassetid://6534947869',
+        Bonk = 'rbxassetid://5766898159',
+        Minecraft = 'rbxassetid://5869422451',
+        Gamesense = 'rbxassetid://4817809188',
+        RIFK7 = 'rbxassetid://9102080552',
+        Bamboo = 'rbxassetid://3769434519',
+        Crowbar = 'rbxassetid://546410481',
+        Weeb = 'rbxassetid://6442965016',
+        Beep = 'rbxassetid://8177256015',
+        Bambi = 'rbxassetid://8437253821',
+        Stone = 'rbxassetid://3581383408',
+        ['Old Fatality'] = 'rbxassetid://6607142036',
+        Click = 'rbxassetid://8053704437',
+        Ding = 'rbxassetid://7149516994',
+        Snow = 'rbxassetid://6455527632',
+        Laser = 'rbxassetid://7837461331',
+        Mario = 'rbxassetid://2815207981',
+        ['Steve \u{41c}\u{438}\u{445}\u{430}\u{439}'] = 'rbxassetid://4965083997',
+        ['Call of Duty'] = 'rbxassetid://5952120301',
+        Bat = 'rbxassetid://3333907347',
+        ['TF2 Critical'] = 'rbxassetid://296102734',
+        Saber = 'rbxassetid://8415678813',
+        Baimware = 'rbxassetid://3124331820',
+        Osu = 'rbxassetid://7149255551',
+        TF2 = 'rbxassetid://2868331684',
+        Slime = 'rbxassetid://6916371803',
+        ['Among Us'] = 'rbxassetid://5700183626',
+        One = 'rbxassetid://7380502345',
+        ['Bone Breaking'] = 'rbxassetid://8029615457',
+    }
+    local var_439, var_440, var_441 = pairs(SoundList)
+    local LocalPlayerReference = LocalPlayer3
+    local var_443 = RunService2
+    local var_444 = {}
+
+    while true do
+        local var_445
+
+        var_441, var_445 = var_439(var_440, var_441)
+
+        if var_441 == nil then
+            break
+        end
+
+        table.insert(var_444, var_441)
+    end
+
+    getgenv().customSoundId = SoundList.Laser
+    getgenv().soundChangerEnabled = false
+
+    local function UpdateWeaponSound(arg_446)
+        if getgenv().soundChangerEnabled then
+            local Shoot = arg_446:FindFirstChild('Shoot', true)
+
+            if Shoot and Shoot:IsA('Sound') then
+                Shoot.SoundId = getgenv().customSoundId
+            end
+        end
+    end
+    local function UpdateAllSounds()
+        if getgenv().soundChangerEnabled then
+            if LocalPlayerReference.Character then
+                UpdateWeaponSound(LocalPlayerReference.Character)
+            end
+
+            local Backpack = LocalPlayerReference:FindFirstChild('Backpack')
+
+            if Backpack then
+                local var_450, var_451, var_452 = ipairs(Backpack:GetChildren())
+
+                while true do
+                    local var_453
+
+                    var_452, var_453 = var_450(var_451, var_452)
+
+                    if var_452 == nil then
+                        break
+                    end
+
+                    UpdateWeaponSound(var_453)
+                end
+            end
+        end
+    end
+
+    local hoodcustoms = Tabs.Misc:AddRightGroupbox('hood customs')
+
+    hoodcustoms:AddToggle('ShootSoundToggle', {
+        Text = 'Enable Shoot Sound Changer',
+        Default = false,
+        Tooltip = 'Toggle custom shoot sound effects',
+        Callback = function(arg_456)
+            getgenv().soundChangerEnabled = arg_456
+
+            if arg_456 then
+                UpdateAllSounds()
+            end
+        end,
+    })
+    hoodcustoms:AddDropdown('ShootSoundDropdown', {
+        Values = var_444,
+        Default = 2,
+        Text = 'ShootSound Selector',
+        Tooltip = 'Pick your gun sound effect',
+        Callback = function(arg_457)
+            getgenv().customSoundId = SoundList[arg_457]
+
+            if getgenv().soundChangerEnabled then
+                UpdateAllSounds()
+            end
+        end,
+    })
+    Menu:AddButton('Unload', function()
+        Library:Unload()
+    end)
+    Menu:AddLabel('Menu bind'):AddKeyPicker('MenuKeybind', {
+        Default = 'End',
+        NoUI = true,
+        Text = 'Menu keybind',
+    })
+
+    Library.ToggleKeybind = Options.MenuKeybind
+
+    Menu:AddToggle('KeybindListToggle', {
+        Text = 'Show Keybind List',
+        Default = false,
+        Callback = function(arg_458)
+            Library.KeybindFrame.Visible = arg_458
+        end,
+    })
+    Menu:AddButton('Copy Job ID', function()
+        setclipboard(game.JobId)
+    end)
+    Menu:AddButton('Copy JS Join Script', function()
+        local var_459 = 'Roblox.GameLauncher.joinGameInstance(' .. game.PlaceId .. ', "' .. game.JobId .. '")'
+
+        setclipboard(var_459)
+    end)
+    Menu:AddInput('JobIdInput', {
+        Default = '',
+        Numeric = false,
+        Finished = true,
+        Text = '..JobId..',
+        Tooltip = 'Enter a Job ID to join a specific server',
+        Placeholder = 'Enter Job ID here',
+        Callback = function(arg_460)
+            game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, arg_460, game:GetService('Players').LocalPlayer)
+        end,
+    })
+    Menu:AddButton('Rejoin Server', function()
+        game:GetService('TeleportService'):TeleportToPlaceInstance(game.PlaceId, game.JobId, game.Players.LocalPlayer)
+    end)
+    ThemeManager:SetLibrary(Library)
+    SaveManager:SetLibrary(Library)
+    SaveManager:IgnoreThemeSettings()
+    SaveManager:SetIgnoreIndexes({
+        'MenuKeybind',
+    })
+    ThemeManager:SetFolder('MaddieHack')
+    SaveManager:SetFolder('MaddieHack/configs')
+    SaveManager:BuildConfigSection(Tabs['UI Settings'])
+    ThemeManager:ApplyToTab(Tabs['UI Settings'])
+    SaveManager:LoadAutoloadConfig()
+    Library:SetWatermarkVisibility(true)
+
+    local Stats = game:GetService('Stats')
+    local MarketplaceService = game:GetService('MarketplaceService')
+    local LastFPSUpdate = tick()
+    local FrameCount = 0
+    local CurrentFPS = 60
+    local StartTime = tick()
+
+    local function GetExecutor()
+        return syn and 'Synapse X' or (secure_call and 'ScriptWare' or (not identifyexecutor and 'Unknown' or identifyexecutor()))
+    end
+    local function GetPlaceName(arg_468)
+        local var_469, var_470 = pcall(function()
+            return MarketplaceService:GetProductInfo(arg_468).Name
+        end)
+
+        return var_469 and var_470 and var_470 or 'Unknown Game'
+    end
+
+    local WatermarkConnection = var_443.RenderStepped:Connect(function()
+        FrameCount = FrameCount + 1
+
+        if tick() - LastFPSUpdate >= 1 then
+            CurrentFPS = FrameCount
+            LastFPSUpdate = tick()
+            FrameCount = 0
+        end
+
+        local var_472 = math.floor(Stats.Network.ServerStatsItem['Data Ping']:GetValue())
+        local var_473 = GetExecutor()
+        local var_474 = math.floor(tick() - StartTime)
+        local formattedTime = string.format('%02d:%02d', math.floor(var_474 / 60), var_474 % 60)
+
+        Library:SetWatermark(('[ ghosted.lol ] %s | %s (%d) | Uptime: %s | FPS %d | %d ms'):format(var_473, GetPlaceName(game.PlaceId), game.PlaceId, formattedTime, math.floor(CurrentFPS), var_472))
+    end)
+
+    Library:OnUnload(function()
+        WatermarkConnection:Disconnect()
+        print('Unloaded!')
+
+        Library.Unloaded = true
+    end)
+end
+
+
+
