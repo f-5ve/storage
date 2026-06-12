@@ -726,8 +726,23 @@ do --// UI Source
         end
 
         Library.Round = function(Self, Number, Float)
-            local Multiplier = 1 / (Float or 1)
-            return math.floor(Number * Multiplier) / Multiplier
+            Float = tonumber(Float) or 1
+
+            if Float < 0 then
+                return Number
+            end
+
+            if Float == 0 then
+                return math.floor(Number + 0.5)
+            end
+
+            if Float >= 1 then
+                local Multiplier = 10 ^ Float
+                return math.floor(Number * Multiplier + 0.5) / Multiplier
+            end
+
+            local Multiplier = 1 / Float
+            return math.floor(Number * Multiplier + 0.5) / Multiplier
         end
 
         Library.GetConfig = function(Self)
@@ -4751,7 +4766,22 @@ do --// UI Source
                 local Max = Params.Max or Params.max or 100
                 local Decimals = Params.Decimals or Params.decimals
 
-                if Decimals == nil then
+                local function GetStep(Value)
+                    Value = tonumber(Value)
+                    if not Value then
+                        return nil
+                    end
+
+                    if Value <= 0 then
+                        return 1
+                    elseif Value >= 1 then
+                        return 1 / (10 ^ Value)
+                    end
+
+                    return Value
+                end
+
+                if Min >= -1 and Max <= 1 and ((GetStep(Decimals) or 1) > 0.001) then
                     Decimals = 0.001
                 end
 
