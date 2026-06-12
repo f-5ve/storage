@@ -53,6 +53,7 @@ do --// UI Source
         Theme = nil,
         KeyListVisible = true,
         KeyListMode = "Active",
+        KeyListShowBind = true,
 
         -- Ignore below
         Threads = { },
@@ -979,6 +980,10 @@ do --// UI Source
             if type(Decoded.hotkeys_mode) == "string" then
                 Library.KeyListMode = NormalizeHotkeyListMode(Decoded.hotkeys_mode)
             end
+
+            if type(Decoded.hotkeys_show_bind) == "boolean" then
+                Library.KeyListShowBind = Decoded.hotkeys_show_bind
+            end
         end
 
         PreloadAutoLoadedHotkeySettings()
@@ -1885,6 +1890,7 @@ do --// UI Source
 
                         KeybindObject:SetMode(ModeText)
                         KeybindObject:SetStatus(Keybind.Toggled, Keybind.Mode)
+                        KeybindObject:SetBind(Keybind.Value)
                     end
                 end
 
@@ -2487,6 +2493,16 @@ do --// UI Source
                     end
                 end
 
+                function KeybindList:SetShowBind(Bool)
+                    Library.KeyListShowBind = Bool == true
+
+                    for Index, Object in KeybindList.Objects do
+                        if Object.Refresh then
+                            Object:Refresh()
+                        end
+                    end
+                end
+
                 function KeybindList:Add(Name, Mode)
                     local NewItems = { } do
                         NewItems["NewKey"] = Library:Create("Frame", {
@@ -2560,6 +2576,8 @@ do --// UI Source
                     local KeybindMode = Mode or "Toggle"
                     local IsVisible = false
                     local StateId = 0
+                    local ModeText = "always"
+                    local BindText = nil
 
                     local function ShouldBeVisible()
                         if not CanBeVisible then
@@ -2575,6 +2593,28 @@ do --// UI Source
                         end
 
                         return IsActive or KeybindMode == "Always"
+                    end
+
+                    local function GetModeText()
+                        if Library.KeyListShowBind and BindText and BindText ~= "" and BindText ~= "None" then
+                            return ("%s %s"):format(BindText, ModeText)
+                        end
+
+                        return ModeText
+                    end
+
+                    local function GetModeTransparency()
+                        return 0
+                    end
+
+                    local function RefreshModeVisibility()
+                        NewItems["Mode"].Instance.Visible = true
+                        NewItems["Mode"].Instance.Text = GetModeText()
+                        if IsVisible then
+                            NewItems["Mode"].Instance.TextTransparency = GetModeTransparency()
+                        else
+                            NewItems["Mode"].Instance.TextTransparency = 1
+                        end
                     end
 
                     local function SetRowVisible(Bool)
@@ -2595,13 +2635,15 @@ do --// UI Source
 
                             NewItems["NewKey"]:Tween({Size = UDim2.new(0, 180, 0, 15), Position = UDim2.new(0, 0, 0, 0)})
                             NewItems["Text"]:Tween({TextTransparency = 0})
-                            NewItems["Mode"]:Tween({TextTransparency = 0})
+                            NewItems["Mode"].Instance.Visible = true
+                            NewItems["Mode"]:Tween({TextTransparency = GetModeTransparency()})
                         elseif not IsVisible then
                             NewItems["NewKey"].Instance.Visible = false
                             NewItems["NewKey"].Instance.Size = UDim2.new(0, 0, 0, 0)
                             NewItems["NewKey"].Instance.Position = UDim2.new(-1, 0, 0, 0)
                             NewItems["Text"].Instance.TextTransparency = 1
                             NewItems["Mode"].Instance.TextTransparency = 1
+                            NewItems["Mode"].Instance.Visible = true
                             return
                         else
                             IsVisible = false
@@ -2620,6 +2662,7 @@ do --// UI Source
                     end
 
                     function NewItems:Refresh()
+                        RefreshModeVisibility()
                         SetRowVisible(ShouldBeVisible())
                     end
 
@@ -2641,7 +2684,15 @@ do --// UI Source
                     end
 
                     function NewItems:SetMode(Mode)
-                        NewItems["Mode"].Instance.Text = Mode
+                        ModeText = Mode or ModeText
+                        NewItems["Mode"].Instance.Text = GetModeText()
+                        RefreshModeVisibility()
+                    end
+
+                    function NewItems:SetBind(Bind)
+                        BindText = Bind
+                        NewItems["Mode"].Instance.Text = GetModeText()
+                        RefreshModeVisibility()
                     end
 
                     table.insert(KeybindList.Objects, NewItems)
@@ -5833,15 +5884,21 @@ do --// UI Source
                         ConfigsSection:Button({
                             Name = "create",
                             Callback = function()
-                                if ConfigName then
-                                    if ConfigName == "" then
-                                        return
-                                    end
+                                local TargetConfig = ConfigSelected or ConfigName
 
-                                    writefile(ConfigsFolder .. ConfigName .. ".json", Library:GetConfig())
+                                if not TargetConfig or TargetConfig == "" then
+                                    return
+                                end
+
+                                local Success, Error = pcall(function()
+                                    writefile(ConfigsFolder .. TargetConfig .. ".json", Library:GetConfig())
+                                end)
+
+                                if Success then
                                     Library:GetConfigsList(ConfigsDropdown)
-
                                     Library:Notification{Name = "created config succesfully", Time = 3}
+                                else
+                                    Library:Notification{Name = "failed to create config: ".. tostring(Error), Time = 3}
                                 end
                             end
                         })
@@ -5876,25 +5933,6 @@ do --// UI Source
                         })
 
                         ConfigsSection:Button({
-                            Name = "save",
-                            Callback = function()
-                                if ConfigSelected then
-                                    if isfile(ConfigsFolder.. ConfigSelected .. ".json") then
-                                        local Success, Error = pcall(function()
-                                            writefile(ConfigsFolder .. ConfigSelected .. ".json", Library:GetConfig())
-                                        end)
-
-                                        if Success then
-                                            Library:Notification{Name = "saved config succesfully", Time = 3}
-                                        else
-                                            Library:Notification{Name = "failed to save config: ".. Error, Time = 3}
-                                        end
-                                    end
-                                end
-                            end
-                        })
-
-                        ConfigsSection:Button({
                             Name = "refresh",
                             Callback = function()
                                 Library:GetConfigsList(ConfigsDropdown)
@@ -5910,6 +5948,19 @@ do --// UI Source
 
                                 if Library.KeyList then
                                     Library.KeyList:SetVisibility(Value)
+                                end
+                            end
+                        })
+
+                        ConfigsSection:Toggle({
+                            Name = "show bind",
+                            Flag = "hotkeys_show_bind",
+                            Default = Library.KeyListShowBind,
+                            Callback = function(Value)
+                                Library.KeyListShowBind = Value
+
+                                if Library.KeyList then
+                                    Library.KeyList:SetShowBind(Value)
                                 end
                             end
                         })
