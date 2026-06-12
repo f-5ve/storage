@@ -4751,7 +4751,7 @@ do --// UI Source
                 local Max = Params.Max or Params.max or 100
                 local Decimals = Params.Decimals or Params.decimals
 
-                if Decimals == nil and Min >= -1 and Max <= 1 then
+                if Decimals == nil then
                     Decimals = 0.001
                 end
 
