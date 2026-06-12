@@ -5145,6 +5145,7 @@ do --// UI Source
                     Default = Params.Default or Params.default or "",
                     Callback = Params.Callback or Params.callback or function() end,
                     Multi = Params.Multi or Params.multi or false,
+                    MaxSize = Params.MaxSize or Params.maxSize or Params.Maxsize or Params.maxsize or 150,
 
                     Window = Self.Window,
                     Page = Self.Page,
@@ -5256,7 +5257,7 @@ do --// UI Source
                         Size = UDim2.new(0, 246, 0, 0),
                         Position = UDim2.new(0, 979, 0, 167),
                         BorderSizePixel = 0,
-                        AutomaticSize = Enum.AutomaticSize.Y,
+                        ClipsDescendants = true,
                         BackgroundColor3 = Library.Theme["Background"]
                     }):AddToTheme({BackgroundColor3 = 'Background'})
 
@@ -5286,9 +5287,23 @@ do --// UI Source
                         PaddingLeft = UDim.new(0, 6)
                     })
 
-                    Library:Create("UIListLayout", {
+                    Items["OptionContent"] = Library:Create("ScrollingFrame", {
                         Name = "\0",
                         Parent = Items["OptionHolder"].Instance,
+                        BackgroundTransparency = 1,
+                        BorderSizePixel = 0,
+                        Size = UDim2.new(1, 0, 1, 0),
+                        CanvasSize = UDim2.new(0, 0, 0, 0),
+                        AutomaticCanvasSize = Enum.AutomaticSize.Y,
+                        ScrollBarThickness = 3,
+                        ScrollBarImageColor3 = Library.Theme["Accent"],
+                        ScrollBarImageTransparency = 0,
+                        ScrollingDirection = Enum.ScrollingDirection.Y
+                    }):AddToTheme({ScrollBarImageColor3 = "Accent"})
+
+                    Library:Create("UIListLayout", {
+                        Name = "\0",
+                        Parent = Items["OptionContent"].Instance,
                         Padding = UDim.new(0, 5),
                         SortOrder = Enum.SortOrder.LayoutOrder
                     })
@@ -5354,7 +5369,7 @@ do --// UI Source
                         Name = "\0",
                         FontFace = Library.Font,
                         TextSize = Library.FontSize,
-                        Parent = Items["OptionHolder"].Instance,
+                        Parent = Items["OptionContent"].Instance,
                         TextColor3 = Library.Theme["Inactive Text"],
                         Text = Value,
                         AutoButtonColor = false,
@@ -5482,6 +5497,20 @@ do --// UI Source
 
                 local IsSettings = Dropdown.Section and Dropdown.Section.IsSettings
 
+                local function GetOptionCount()
+                    local Count = 0
+
+                    for Index, Value in Dropdown.Options do
+                        Count = Count + 1
+                    end
+
+                    return Count
+                end
+
+                local function GetOpenHeight()
+                    return math.clamp((GetOptionCount() * 17) + 12, 24, Dropdown.MaxSize)
+                end
+
                 function Dropdown:SetOpen(Bool)
                     if Debounce then
                         return
@@ -5493,7 +5522,7 @@ do --// UI Source
 
                     if Dropdown.IsOpen then
                         OptionHolder.Position = UDim2.new(0, RealDropdown.AbsolutePosition.X, 0, RealDropdown.AbsolutePosition.Y + RealDropdown.AbsoluteSize.Y + GuiInset)
-                        OptionHolder.Size = UDim2.new(0, RealDropdown.AbsoluteSize.X, 0, Dropdown.MaxSize)
+                        OptionHolder.Size = UDim2.new(0, RealDropdown.AbsoluteSize.X, 0, GetOpenHeight())
 
                         OptionHolder.Parent = Library.Holder.Instance
                         Items["OptionHolder"]:Tween({Position = UDim2.new(0, RealDropdown.AbsolutePosition.X, 0, RealDropdown.AbsolutePosition.Y + RealDropdown.AbsoluteSize.Y + 10 + GuiInset)})
