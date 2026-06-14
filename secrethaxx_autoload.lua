@@ -4320,8 +4320,9 @@ do --// UI Source
                             Name = "\0",
                             Parent = Library.UnusedHolder.Instance,
                             BackgroundTransparency = 1,
-                            Size = UDim2.new(1, 0, 1, 0),
-                            BorderSizePixel = 0
+                            Size = UDim2.new(1, 0, 0, 0),
+                            BorderSizePixel = 0,
+                            AutomaticSize = Enum.AutomaticSize.Y
                         })
 
                         Library:Create("UIListLayout", {
