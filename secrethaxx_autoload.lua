@@ -1158,9 +1158,7 @@ do --// UI Source
                         AutoButtonColor = false,
                         Size = UDim2.new(0, 20, 0, 8),
                         BorderSizePixel = 0,
-                        BackgroundColor3 = Color3.fromRGB(255, 143, 203),
-                        AnchorPoint = Vector2.new(0, 0.5),
-                        Position = UDim2.new(0, 0, 0.5, -208972301)
+                        BackgroundColor3 = Color3.fromRGB(255, 143, 203)
                     })
 
                     Library:Create("UIStroke", {
@@ -1449,14 +1447,11 @@ do --// UI Source
                     Debounce = true
 
                     if Colorpicker.IsOpen then
-                        local RowElement = Data.RowElement and Data.RowElement.Instance
-                        local BaseY = RowElement and (RowElement.AbsolutePosition.Y + RowElement.AbsoluteSize.Y + GuiInset) or (ColorpickerButton.AbsolutePosition.Y + ColorpickerButton.AbsoluteSize.Y + GuiInset)
-
-                        ColorpickerWindow.Position = UDim2.new(0, ColorpickerButton.AbsolutePosition.X, 0, BaseY)
+                        ColorpickerWindow.Position = UDim2.new(0, ColorpickerButton.AbsolutePosition.X, 0, ColorpickerButton.AbsolutePosition.Y + ColorpickerButton.AbsoluteSize.Y + GuiInset)
 
                         ColorpickerWindow.Parent = Library.Holder.Instance
                         ColorpickerWindow.Visible = true
-                        Items["ColorpickerWindow"]:Tween({Position = UDim2.new(0, ColorpickerButton.AbsolutePosition.X, 0, BaseY + 10)})
+                        Items["ColorpickerWindow"]:Tween({Position = UDim2.new(0, ColorpickerButton.AbsolutePosition.X, 0, ColorpickerButton.AbsolutePosition.Y + ColorpickerButton.AbsoluteSize.Y + 10 + GuiInset)})
 
                         Items["ColorpickerWindow"]:FadeDescendants(true, function()
                             Debounce = false
@@ -4507,7 +4502,11 @@ do --// UI Source
                         AnchorPoint = Vector2.new(1, 0),
                         BackgroundTransparency = 1,
                         Position = UDim2.new(1, -1, 0, 0),
-                        Size = UDim2.new(0, 0, 1, 0),
+                        -- Fixed to the header height (not the toggle's full height): when a
+                        -- toggle has nested Settings content it becomes AutomaticSize.Y and
+                        -- tall, which would otherwise vertically-centre the colorpicker/keybind
+                        -- into the middle of the nested rows.
+                        Size = UDim2.new(0, 0, 0, 12),
                         BorderSizePixel = 0
                     })
 
@@ -4588,8 +4587,7 @@ do --// UI Source
                         Flag = Colorpicker.Flag,
                         Default = Colorpicker.Default,
                         Callback = Colorpicker.Callback,
-                        Alpha = Colorpicker.Alpha,
-                        RowElement = Items["Toggle"]
+                        Alpha = Colorpicker.Alpha
                     })
 
                     return NewColorpicker
@@ -5702,8 +5700,7 @@ do --// UI Source
                         Flag = Colorpicker.Flag,
                         Default = Colorpicker.Default,
                         Callback = Colorpicker.Callback,
-                        Alpha = Colorpicker.Alpha,
-                        RowElement = Items["Label"]
+                        Alpha = Colorpicker.Alpha
                     })
 
                     return NewColorpicker
