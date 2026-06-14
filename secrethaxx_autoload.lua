@@ -4526,6 +4526,23 @@ do --// UI Source
                     Toggle.Items = Items
                 end
 
+                -- Colorpickers / keybinds live in the right-aligned SubElements strip.
+                -- A plain toggle row is only 12px tall, which leaves the centered widget
+                -- almost touching the (taller, 20px) slider rows above and below it.
+                -- Grow the row to slider height and re-center the toggle's own parts so the
+                -- widget gets real vertical breathing room.
+                local RowExpanded = false
+                local function ExpandRow()
+                    if RowExpanded then
+                        return
+                    end
+                    RowExpanded = true
+
+                    Items["Toggle"].Instance.Size = UDim2.new(1, 0, 0, 20)
+                    Items["Indicator"].Instance.Position = UDim2.new(0, 2, 0, 6)
+                    Items["Text"].Instance.Position = UDim2.new(0, 18, 0, 4)
+                end
+
                 function Toggle:Set(Bool)
                     Toggle.Value = Bool
 
@@ -4587,6 +4604,8 @@ do --// UI Source
                         Alpha = Colorpicker.Alpha
                     })
 
+                    ExpandRow()
+
                     return NewColorpicker
                 end
 
@@ -4619,6 +4638,10 @@ do --// UI Source
 
                     if type(Keybind.Name) == "string" and Keybind.Name:sub(-8) == " Keybind" then
                         Toggle.MasterKeybind = NewKeybind
+                    else
+                        -- Master keybinds (the toggle's own hotkey) render a tiny text button;
+                        -- only grow the row for user-facing keybind widgets.
+                        ExpandRow()
                     end
 
                     return NewKeybind
@@ -5668,6 +5691,19 @@ do --// UI Source
                     Label.Items = Items
                 end
 
+                -- Same rationale as the toggle: a label that carries a colorpicker/keybind
+                -- needs slider-height so the widget doesn't clip into adjacent rows.
+                local RowExpanded = false
+                local function ExpandRow()
+                    if RowExpanded then
+                        return
+                    end
+                    RowExpanded = true
+
+                    Items["Label"].Instance.Size = UDim2.new(1, 0, 0, 20)
+                    Items["Text"].Instance.Position = UDim2.new(0, 1, 0, 4)
+                end
+
                 function Label:SetVisibility(Bool)
                     Items["Label"].Instance.Visible = Bool
                 end
@@ -5700,6 +5736,8 @@ do --// UI Source
                         Alpha = Colorpicker.Alpha
                     })
 
+                    ExpandRow()
+
                     return NewColorpicker
                 end
 
@@ -5728,6 +5766,8 @@ do --// UI Source
                         Mode = Keybind.Mode,
                         Callback = Keybind.Callback
                     })
+
+                    ExpandRow()
 
                     return NewKeybind
                 end
