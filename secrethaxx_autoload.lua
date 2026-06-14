@@ -1158,7 +1158,9 @@ do --// UI Source
                         AutoButtonColor = false,
                         Size = UDim2.new(0, 20, 0, 8),
                         BorderSizePixel = 0,
-                        BackgroundColor3 = Color3.fromRGB(255, 143, 203)
+                        BackgroundColor3 = Color3.fromRGB(255, 143, 203),
+                        AnchorPoint = Vector2.new(0, 0.5),
+                        Position = UDim2.new(0, 0, 0.5, 1)
                     })
 
                     Library:Create("UIStroke", {
