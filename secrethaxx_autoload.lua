@@ -1447,11 +1447,14 @@ do --// UI Source
                     Debounce = true
 
                     if Colorpicker.IsOpen then
-                        ColorpickerWindow.Position = UDim2.new(0, ColorpickerButton.AbsolutePosition.X, 0, ColorpickerButton.AbsolutePosition.Y + ColorpickerButton.AbsoluteSize.Y + GuiInset)
+                        local RowElement = Data.RowElement and Data.RowElement.Instance
+                        local BaseY = RowElement and (RowElement.AbsolutePosition.Y + GuiInset) or (ColorpickerButton.AbsolutePosition.Y + ColorpickerButton.AbsoluteSize.Y + GuiInset)
+
+                        ColorpickerWindow.Position = UDim2.new(0, ColorpickerButton.AbsolutePosition.X, 0, BaseY)
 
                         ColorpickerWindow.Parent = Library.Holder.Instance
                         ColorpickerWindow.Visible = true
-                        Items["ColorpickerWindow"]:Tween({Position = UDim2.new(0, ColorpickerButton.AbsolutePosition.X, 0, ColorpickerButton.AbsolutePosition.Y + ColorpickerButton.AbsoluteSize.Y + 10 + GuiInset)})
+                        Items["ColorpickerWindow"]:Tween({Position = UDim2.new(0, ColorpickerButton.AbsolutePosition.X, 0, BaseY + 10)})
 
                         Items["ColorpickerWindow"]:FadeDescendants(true, function()
                             Debounce = false
@@ -4583,7 +4586,8 @@ do --// UI Source
                         Flag = Colorpicker.Flag,
                         Default = Colorpicker.Default,
                         Callback = Colorpicker.Callback,
-                        Alpha = Colorpicker.Alpha
+                        Alpha = Colorpicker.Alpha,
+                        RowElement = Items["Toggle"]
                     })
 
                     return NewColorpicker
@@ -5696,7 +5700,8 @@ do --// UI Source
                         Flag = Colorpicker.Flag,
                         Default = Colorpicker.Default,
                         Callback = Colorpicker.Callback,
-                        Alpha = Colorpicker.Alpha
+                        Alpha = Colorpicker.Alpha,
+                        RowElement = Items["Label"]
                     })
 
                     return NewColorpicker
