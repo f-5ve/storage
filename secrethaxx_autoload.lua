@@ -1448,7 +1448,7 @@ do --// UI Source
 
                     if Colorpicker.IsOpen then
                         local RowElement = Data.RowElement and Data.RowElement.Instance
-                        local BaseY = RowElement and (RowElement.AbsolutePosition.Y + GuiInset) or (ColorpickerButton.AbsolutePosition.Y + ColorpickerButton.AbsoluteSize.Y + GuiInset)
+                        local BaseY = RowElement and (RowElement.AbsolutePosition.Y + GuiInset + 3) or (ColorpickerButton.AbsolutePosition.Y + ColorpickerButton.AbsoluteSize.Y + GuiInset)
 
                         ColorpickerWindow.Position = UDim2.new(0, ColorpickerButton.AbsolutePosition.X, 0, BaseY)
 
