@@ -1160,7 +1160,7 @@ do --// UI Source
                         BorderSizePixel = 0,
                         BackgroundColor3 = Color3.fromRGB(255, 143, 203),
                         AnchorPoint = Vector2.new(0, 0.5),
-                        Position = UDim2.new(0, 0, 0.5, 1)
+                        Position = UDim2.new(0, 0, 0.5, -2)
                     })
 
                     Library:Create("UIStroke", {
