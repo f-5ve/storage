@@ -4502,11 +4502,7 @@ do --// UI Source
                         AnchorPoint = Vector2.new(1, 0),
                         BackgroundTransparency = 1,
                         Position = UDim2.new(1, -1, 0, 0),
-                        -- Fixed to the header height (not the toggle's full height): when a
-                        -- toggle has nested Settings content it becomes AutomaticSize.Y and
-                        -- tall, which would otherwise vertically-centre the colorpicker/keybind
-                        -- into the middle of the nested rows.
-                        Size = UDim2.new(0, 0, 0, 12),
+                        Size = UDim2.new(0, 0, 1, 0),
                         BorderSizePixel = 0
                     })
 
