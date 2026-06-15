@@ -5928,36 +5928,38 @@ do --// UI Source
 
             Library.InitWindow = function(Self)
                 local ConfigsDropdown
-                local AutoLoadToggle
+                local CurrentAutoLoadLabel
                 local AutoLoadReady = false
                 local AutoLoadEnabled, AutoLoadConfig = ReadAutoLoad()
+
+                local function UpdateAutoLoadLabel(Name)
+                    if CurrentAutoLoadLabel then
+                        CurrentAutoLoadLabel:SetText("current autoload: " .. (Name and Name ~= "" and Name or "none"))
+                    end
+                end
 
                 local SettingsPage = Self:Page({Name = "settings"}) do
                     local ConfigsSection = SettingsPage:Section({Name = "configs", Side = 2}) do
                         ConfigsDropdown = ConfigsSection:Dropdown({
-                            Name = "configs",
+                            Name = "config list",
                             Flag = "configs_dropdown",
                             Items = { },
                             Multi = false,
                             Callback = function(Value)
                                 ConfigSelected = Value
-
-                                if AutoLoadReady and Flags["config_auto_load"] and Value then
-                                    WriteAutoLoad(true, Value)
-                                end
                             end
                         })
 
                         ConfigsSection:Textbox({
                             Flag = "config_name",
-                            Placeholder = "",
+                            Placeholder = "config name",
                             Callback = function(Value)
                                 ConfigName = Value
                             end
                         })
 
                         ConfigsSection:Button({
-                            Name = "create",
+                            Name = "create config",
                             Callback = function()
                                 local TargetConfig = ConfigSelected or ConfigName
 
@@ -5979,7 +5981,7 @@ do --// UI Source
                         })
 
                         ConfigsSection:Button({
-                            Name = "delete",
+                            Name = "delete config",
                             Callback = function()
                                 if ConfigSelected then
                                     if isfile(ConfigsFolder .. ConfigSelected .. ".json") then
@@ -5993,7 +5995,7 @@ do --// UI Source
                         })
 
                         ConfigsSection:Button({
-                            Name = "load",
+                            Name = "load config",
                             Callback = function()
                                 if ConfigSelected then
                                     local Success, Error = LoadConfigByName(ConfigSelected)
@@ -6008,7 +6010,7 @@ do --// UI Source
                         })
 
                         ConfigsSection:Button({
-                            Name = "refresh",
+                            Name = "refresh list",
                             Callback = function()
                                 Library:GetConfigsList(ConfigsDropdown)
                             end
@@ -6055,38 +6057,85 @@ do --// UI Source
                             end
                         })
 
-                        AutoLoadToggle = ConfigsSection:Toggle({
-                            Name = "auto load",
-                            Flag = "config_auto_load",
-                            Default = AutoLoadEnabled,
-                            Callback = function(Value)
-                                if not AutoLoadReady then
+                        ConfigsSection:Button({
+                            Name = "overwrite config",
+                            Callback = function()
+                                local TargetConfig = ConfigSelected or ConfigName
+
+                                if not TargetConfig or TargetConfig == "" then
+                                    Library:Notification{Name = "select or name a config first", Time = 3}
                                     return
                                 end
 
-                                if Value then
-                                    AutoLoadReady = false
-                                    local Success, Error = LoadConfigByName(ConfigSelected)
+                                local Success, Error = pcall(function()
+                                    writefile(ConfigsFolder .. TargetConfig .. ".json", Library:GetConfig())
+                                end)
 
-                                    if Success and AutoLoadToggle then
-                                        AutoLoadToggle:Set(true)
-                                    end
-
-                                    AutoLoadReady = true
-
-                                    if Success then
-                                        WriteAutoLoad(true, ConfigSelected)
-                                        Library:Notification{Name = "auto load enabled: " .. ConfigSelected, Time = 3}
-                                    else
-                                        WriteAutoLoad(false, "")
-                                        AutoLoadReady = false
-                                        AutoLoadToggle:Set(false)
-                                        AutoLoadReady = true
-                                        Library:Notification{Name = "auto load failed: " .. tostring(Error), Time = 3}
-                                    end
+                                if Success then
+                                    Library:GetConfigsList(ConfigsDropdown)
+                                    Library:Notification{Name = "overwrote config: " .. TargetConfig, Time = 3}
                                 else
-                                    WriteAutoLoad(false, ConfigSelected or "")
-                                    Library:Notification{Name = "auto load disabled", Time = 3}
+                                    Library:Notification{Name = "failed to overwrite config: " .. tostring(Error), Time = 3}
+                                end
+                            end
+                        })
+
+                        ConfigsSection:Button({
+                            Name = "set autoload",
+                            Callback = function()
+                                if ConfigSelected and ConfigSelected ~= "" then
+                                    WriteAutoLoad(true, ConfigSelected)
+                                    UpdateAutoLoadLabel(ConfigSelected)
+                                    Library:Notification{Name = "autoload set: " .. ConfigSelected, Time = 3}
+                                else
+                                    Library:Notification{Name = "select a config first", Time = 3}
+                                end
+                            end
+                        })
+
+                        ConfigsSection:Button({
+                            Name = "remove autoload",
+                            Callback = function()
+                                WriteAutoLoad(false, "")
+                                UpdateAutoLoadLabel(nil)
+                                Library:Notification{Name = "autoload removed", Time = 3}
+                            end
+                        })
+
+                        CurrentAutoLoadLabel = ConfigsSection:Label({Name = "current autoload: none"})
+
+                        ConfigsSection:Label({Name = "import from clipboard"})
+
+                        ConfigsSection:Textbox({
+                            Flag = "config_import",
+                            Save = false,
+                            Finished = true,
+                            Placeholder = "paste config here...",
+                            Callback = function(Value)
+                                if not Value or Value == "" then
+                                    return
+                                end
+
+                                local Success, Error = Library:LoadConfig(Value)
+
+                                if Success then
+                                    Library:Notification{Name = "imported config from clipboard", Time = 3}
+                                else
+                                    Library:Notification{Name = "failed to import config: " .. tostring(Error), Time = 3}
+                                end
+                            end
+                        })
+
+                        ConfigsSection:Button({
+                            Name = "copy config to clipboard",
+                            Callback = function()
+                                local Data = Library:GetConfig()
+
+                                if Data and setclipboard then
+                                    setclipboard(Data)
+                                    Library:Notification{Name = "copied config to clipboard", Time = 3}
+                                else
+                                    Library:Notification{Name = "clipboard not supported", Time = 3}
                                 end
                             end
                         })
@@ -6094,6 +6143,7 @@ do --// UI Source
                         AutoLoadReady = true
 
                         Library:GetConfigsList(ConfigsDropdown)
+                        UpdateAutoLoadLabel(AutoLoadEnabled and AutoLoadConfig or nil)
                     end
 
                     local ThemingSection = SettingsPage:Section({Name = "theming", Side = 1}) do
@@ -6169,16 +6219,12 @@ do --// UI Source
                                 ConfigsDropdown:Set(AutoLoadConfig)
                             end
 
-                            if AutoLoadToggle then
-                                AutoLoadToggle:Set(true)
-                            end
+                            UpdateAutoLoadLabel(AutoLoadConfig)
 
                             WriteAutoLoad(true, AutoLoadConfig)
                             Library:Notification{Name = "auto loaded config: " .. AutoLoadConfig, Time = 3}
                         else
-                            if AutoLoadToggle then
-                                AutoLoadToggle:Set(false)
-                            end
+                            UpdateAutoLoadLabel(nil)
 
                             WriteAutoLoad(false, AutoLoadConfig)
                             Library:Notification{Name = "failed to auto load config: " .. tostring(Error), Time = 3}
