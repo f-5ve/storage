@@ -452,7 +452,13 @@ do --// UI Source
                 [Property] = Visibility and OldTransparency or 1
             }, nil, Object)
 
-            Library:Connect(NewTween.Completed, function()
+            -- Self-disconnecting: tab switches call this for every faded descendant. Routing
+            -- it through Library:Connect would append a connection to Library.Connections that
+            -- is never removed, leaking a growing pile of dead connections on each switch.
+            local FadeConnection
+            FadeConnection = NewTween.Completed:Connect(function()
+                FadeConnection:Disconnect()
+
                 if not Visibility then
                     task.wait()
                     Object[Property] = OldTransparency
@@ -486,7 +492,13 @@ do --// UI Source
                 end
             end
 
-            Library:Connect(NewTween.Completed, function()
+            -- Self-disconnecting for the same reason as Library.Fade above: Page:Turn fires
+            -- FadeDescendants on every tab switch, so a permanent Library:Connect here would
+            -- accumulate one dead connection per switch and steadily cost FPS over a session.
+            local FadeConnection
+            FadeConnection = NewTween.Completed:Connect(function()
+                FadeConnection:Disconnect()
+
                 if Callback and type(Callback) == "function" then
                     Callback()
                 end
@@ -4502,7 +4514,11 @@ do --// UI Source
                         AnchorPoint = Vector2.new(1, 0),
                         BackgroundTransparency = 1,
                         Position = UDim2.new(1, -1, 0, 0),
-                        Size = UDim2.new(0, 0, 1, 0),
+                        -- Fixed to the header height (not the toggle's full height): when a
+                        -- toggle has nested Settings content it becomes AutomaticSize.Y and
+                        -- tall, which would otherwise vertically-centre the colorpicker/keybind
+                        -- into the middle of the nested rows.
+                        Size = UDim2.new(0, 0, 0, 12),
                         BorderSizePixel = 0
                     })
 
@@ -5734,6 +5750,36 @@ do --// UI Source
                 Label:SetText(Label.Name)
 
                 return setmetatable(Label, Library)
+            end
+
+            -- Standalone colorpicker / keybind rows.
+            -- Toggle:Colorpicker and Label:Colorpicker attach a widget to an existing row,
+            -- but section-like containers (Section, a toggle's Settings, multisection
+            -- sub-sections) had no way to add a colorpicker on their own. These build a
+            -- label row inside the container and attach the widget to it, so calls like
+            -- Settings:Colorpicker{...} / Section:Colorpicker{...} work. Because the widget
+            -- rides on a normal 12px label row, the swatch sits on the same level as the
+            -- label text automatically.
+            Library.Colorpicker = function(Self, Params)
+                Params = Params or { }
+
+                local NewLabel = Self:Label({
+                    Name = Params.Name or Params.name or "Colorpicker",
+                    Parent = Params.Parent
+                })
+
+                return NewLabel:Colorpicker(Params)
+            end
+
+            Library.Keybind = function(Self, Params)
+                Params = Params or { }
+
+                local NewLabel = Self:Label({
+                    Name = Params.Name or Params.name or "Keybind",
+                    Parent = Params.Parent
+                })
+
+                return NewLabel:Keybind(Params)
             end
 
             Library.Textbox = function(Self, Params)
